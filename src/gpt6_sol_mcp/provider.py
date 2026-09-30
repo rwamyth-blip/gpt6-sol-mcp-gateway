@@ -269,6 +269,50 @@ KNOWN_MODELS: dict[str, dict[str, Any]] = {
         "measured_median_latency_s": 0.30,
         "measured_median_output_tokens": 198,
     },
+
+    # -- Z.ai GLM (OpenAI-compatible endpoint https://api.z.ai/api/paas/v4) --
+    # The standalone Z.ai team on this gateway: Flash = easy 80% tier,
+    # GLM-5 = mid 15% tier, GLM-5.1 = hard 5% tier. Prices are the published
+    # Z.ai rates per Mtok (Flash is the promo price); context windows are
+    # published sizes. reasoning_effort is ("none",) because GLM uses its own
+    # `thinking` parameter instead of OpenAI's field -- the provider never
+    # sends reasoning_effort for glm-* models (see _chat below).
+    "glm-4.5-flash": {
+        "label": "GLM-4.5 Flash (Z.ai)",
+        "tier": "efficient",
+        "context_window": 128_000,
+        "max_output": 32_768,
+        "reasoning_effort": ("none",),
+        "input_price_per_mtok": 0.075,
+        "output_price_per_mtok": 0.25,
+    },
+    "glm-5.3-flash": {
+        "label": "GLM-5.3 Flash (Z.ai)",
+        "tier": "efficient",
+        "context_window": 128_000,
+        "max_output": 32_768,
+        "reasoning_effort": ("none",),
+        "input_price_per_mtok": 0.075,
+        "output_price_per_mtok": 0.25,
+    },
+    "glm-5": {
+        "label": "GLM-5 (Z.ai)",
+        "tier": "balanced",
+        "context_window": 200_000,
+        "max_output": 96_000,
+        "reasoning_effort": ("none",),
+        "input_price_per_mtok": 1.0,
+        "output_price_per_mtok": 3.2,
+    },
+    "glm-5.1": {
+        "label": "GLM-5.1 (Z.ai)",
+        "tier": "flagship",
+        "context_window": 200_000,
+        "max_output": 96_000,
+        "reasoning_effort": ("none",),
+        "input_price_per_mtok": 1.4,
+        "output_price_per_mtok": 4.4,
+    },
 }
 
 # Aliases the provider accepts, mapped onto a canonical id above.
@@ -292,6 +336,12 @@ MODEL_ALIASES: dict[str, str] = {
     "nemotron-3-nano": "nemotron-3-nano:30b-cloud",
     "nemotron-3-super": "nemotron-3-super:cloud",
     "nemotron-3-ultra": "nemotron-3-ultra:cloud",
+    # Z.ai GLM aliases (standalone Z.ai team).
+    "zai-flash": "glm-4.5-flash",
+    "glm-flash": "glm-4.5-flash",
+    "glm": "glm-5",
+    "zai": "glm-5",
+    "glm51": "glm-5.1",
 }
 
 # ---------------------------------------------------------------------------
@@ -628,6 +678,11 @@ class LLMProvider:
             body["reasoning_effort"] = "none" if "none" in allowed else allowed[0]
         elif effort:
             body["reasoning_effort"] = effort
+
+        # GLM (Z.ai) does not implement OpenAI's reasoning_effort field; a
+        # strict upstream may 400 on unknown params, so never send it there.
+        if model.startswith("glm-") or "z.ai" in self.base_url:
+            body.pop("reasoning_effort", None)
 
         headers = {
             "Authorization": f"Bearer {self.api_key}",

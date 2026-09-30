@@ -78,3 +78,7 @@ desktop.ini
 _scratch/
 *.log
 logs/
+
+# -- mcp5-Zai standalone launcher output ----------------------------------
+_zai_gw.err
+_zai_gw.out
