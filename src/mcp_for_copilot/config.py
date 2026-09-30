@@ -54,6 +54,36 @@ class Settings(BaseSettings):
         ),
     )
 
+    # -- LLM fallback provider (Z.ai / GLM) -------------------------------
+    # When the primary provider (OpenAI) is unreachable -- network error,
+    # timeout, or a 5xx -- the adapter retries the same request against this
+    # backup endpoint. Disabled unless a fallback key is configured, so an
+    # unset fallback never changes behaviour.
+    llm_fallback_enabled: bool = Field(
+        default=True,
+        description=(
+            "When True and a fallback key is set, retry the request against the "
+            "fallback provider if the primary one fails with a transport error, "
+            "timeout, or 5xx response."
+        ),
+    )
+    llm_fallback_api_key: str = Field(
+        default="",
+        description="Fallback provider API key (Z.ai). Never commit this.",
+    )
+    llm_fallback_base_url: str = Field(
+        default="https://api.z.ai/api/paas/v4",
+        description="Fallback OpenAI-compatible base URL (no trailing /chat/completions).",
+    )
+    llm_fallback_model_id: str = Field(
+        default="glm-4.5-flash",
+        description=(
+            "Fallback model id or alias. Defaults to the cheap GLM Flash tier; "
+            "override per request with 'glm-5' (mid) or 'glm-5.1' (hard)."
+        ),
+    )
+    llm_fallback_timeout_seconds: int = Field(default=120, ge=1)
+
     # -- MCP servers ------------------------------------------------------
     # Support for multiple MCP servers. Either use the new MCP_SERVERS field
     # (recommended) or the deprecated single server fields below.
@@ -169,6 +199,24 @@ class Settings(BaseSettings):
                 return fallback
         return value
 
+    @field_validator("llm_fallback_api_key", mode="before")
+    @classmethod
+    def _fallback_to_zai_key(cls, value: object) -> object:
+        """Accept ``ZAI_API_KEY`` when ``LLM_FALLBACK_API_KEY`` is unset.
+
+        Z.ai's own conventional variable name is ``ZAI_API_KEY`` (that is what
+        the standalone mcp5-Zai gateway uses). Honouring it here means the
+        backup key can be exported once and picked up by every gateway on the
+        machine without duplicating it under a second name.
+        """
+        if isinstance(value, str) and value.strip():
+            return value
+        for name in ("ZAI_API_KEY", "LLM_FALLBACK_API_KEY"):
+            fallback = os.environ.get(name, "").strip()
+            if fallback:
+                return fallback
+        return value
+
     @field_validator("mcp_transport")
     @classmethod
     def _check_transport(cls, value: str) -> str:
@@ -209,6 +257,15 @@ class Settings(BaseSettings):
         return bool(self.llm_api_key.strip() and self.llm_model_id.strip())
 
     @property
+    def llm_fallback_configured(self) -> bool:
+        """True when the Z.ai backup is usable (enabled + key + model)."""
+        return bool(
+            self.llm_fallback_enabled
+            and self.llm_fallback_api_key.strip()
+            and self.llm_fallback_model_id.strip()
+        )
+
+    @property
     def mcp_configured(self) -> bool:
         # Backward compatibility: check if deprecated single server fields are set
         if bool(self.mcp_server_url.strip()):
@@ -243,6 +300,11 @@ class Settings(BaseSettings):
             "llm_base_url": self.llm_base_url,
             "llm_api_key_present": bool(self.llm_api_key),
             "llm_reasoning_effort": self.llm_reasoning_effort or None,
+            "llm_fallback_enabled": self.llm_fallback_enabled,
+            "llm_fallback_configured": self.llm_fallback_configured,
+            "llm_fallback_base_url": self.llm_fallback_base_url,
+            "llm_fallback_model_id": self.llm_fallback_model_id,
+            "llm_fallback_api_key_present": bool(self.llm_fallback_api_key),
             "mcp_transport": self.mcp_transport,
             "mcp_server_url": redact(self.mcp_server_url),
             "mcp_servers": self._describe_mcp_servers(),

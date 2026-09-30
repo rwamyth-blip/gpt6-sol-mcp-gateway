@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import ClassVar
 
 import httpx
@@ -388,3 +389,181 @@ class TestToOpenAITools:
 
         converted = LLMProvider.to_openai_tools([Bare()])
         assert converted[0]["function"]["parameters"] == {"type": "object", "properties": {}}
+
+
+class TestZaiFallback:
+    """The Z.ai (GLM) backup used when the primary provider is unreachable."""
+
+    def _provider(self, transport, **kwargs) -> LLMProvider:
+        defaults = {
+            "api_key": "sk-primary",
+            "model_id": "gpt-6-sol",
+            "base_url": "https://api.openai.test/v1",
+            "transport": transport,
+            "fallback_api_key": "zai-key",
+            "fallback_base_url": "https://api.z.ai/api/paas/v4",
+            "fallback_model_id": "glm-4.5-flash",
+            "fallback_enabled": True,
+        }
+        defaults.update(kwargs)
+        return LLMProvider(**defaults)
+
+    def test_glm_models_are_registered(self) -> None:
+        for model_id in ("glm-4.5-flash", "glm-5", "glm-5.1", "glm-5.3-flash"):
+            assert model_id in KNOWN_MODELS
+            assert KNOWN_MODELS[model_id]["reasoning_effort"] == ("none",)
+
+    @pytest.mark.parametrize(
+        ("alias", "expected"),
+        [
+            ("zai", "glm-5"),
+            ("glm", "glm-5"),
+            ("glm-flash", "glm-4.5-flash"),
+            ("zai-flash", "glm-4.5-flash"),
+            ("glm51", "glm-5.1"),
+        ],
+    )
+    def test_glm_aliases_resolve(self, alias: str, expected: str) -> None:
+        assert resolve_model_id(alias) == expected
+
+    def test_fallback_configured_requires_key(self) -> None:
+        assert self._provider(mock_transport(make_completion())).fallback_configured is True
+        assert (
+            self._provider(mock_transport(make_completion()), fallback_api_key="").fallback_configured
+            is False
+        )
+        assert (
+            self._provider(
+                mock_transport(make_completion()), fallback_enabled=False
+            ).fallback_configured
+            is False
+        )
+
+    def test_describe_never_leaks_the_fallback_key(self) -> None:
+        described = self._provider(mock_transport(make_completion())).describe()
+        assert described["fallback_api_key_present"] is True
+        assert "zai-key" not in str(described)
+
+    async def test_5xx_triggers_fallback(self) -> None:
+        captured: list[dict] = []
+        calls = {"n": 0}
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            captured.append(json.loads(request.content.decode("utf-8")))
+            calls["n"] += 1
+            if calls["n"] == 1:
+                return httpx.Response(503, json={"error": {"message": "down"}})
+            return httpx.Response(200, json=make_completion(content="from zai"))
+
+        provider = self._provider(httpx.MockTransport(handler))
+        result = await provider.complete([{"role": "user", "content": "hi"}])
+        assert result.content == "from zai"
+        assert len(captured) == 2
+        assert captured[1]["model"] == "glm-4.5-flash"
+
+    async def test_transport_error_triggers_fallback(self) -> None:
+        captured: list[dict] = []
+        calls = {"n": 0}
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            captured.append(json.loads(request.content.decode("utf-8")))
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise httpx.ConnectError("no route to host", request=request)
+            return httpx.Response(200, json=make_completion(content="zai ok"))
+
+        provider = self._provider(httpx.MockTransport(handler))
+        result = await provider.complete([{"role": "user", "content": "hi"}])
+        assert result.content == "zai ok"
+        assert captured[1]["model"] == "glm-4.5-flash"
+
+    async def test_timeout_triggers_fallback(self) -> None:
+        calls = {"n": 0}
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            calls["n"] += 1
+            if calls["n"] == 1:
+                raise httpx.ReadTimeout("too slow", request=request)
+            return httpx.Response(200, json=make_completion(content="zai ok"))
+
+        provider = self._provider(httpx.MockTransport(handler))
+        result = await provider.complete([{"role": "user", "content": "hi"}])
+        assert result.content == "zai ok"
+
+    async def test_4xx_does_not_trigger_fallback(self) -> None:
+        calls = {"n": 0}
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            calls["n"] += 1
+            return httpx.Response(400, json={"error": {"message": "bad request"}})
+
+        provider = self._provider(httpx.MockTransport(handler))
+        with pytest.raises(LLMProviderError, match="HTTP 400"):
+            await provider.complete([{"role": "user", "content": "hi"}])
+        assert calls["n"] == 1
+
+    async def test_no_fallback_when_not_configured(self) -> None:
+        calls = {"n": 0}
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            calls["n"] += 1
+            return httpx.Response(503, json={"error": {"message": "down"}})
+
+        provider = self._provider(httpx.MockTransport(handler), fallback_api_key="")
+        with pytest.raises(LLMProviderError, match="HTTP 503"):
+            await provider.complete([{"role": "user", "content": "hi"}])
+        assert calls["n"] == 1
+
+    async def test_both_failures_are_reported(self) -> None:
+        def handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(503, json={"error": {"message": "down"}})
+
+        provider = self._provider(httpx.MockTransport(handler))
+        with pytest.raises(LLMProviderError) as excinfo:
+            await provider.complete([{"role": "user", "content": "hi"}])
+        message = str(excinfo.value)
+        assert "primary LLM failed" in message
+        assert "Z.ai fallback also failed" in message
+
+    async def test_fallback_never_sends_reasoning_effort(self) -> None:
+        captured: list[dict] = []
+        calls = {"n": 0}
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            captured.append(json.loads(request.content.decode("utf-8")))
+            calls["n"] += 1
+            if calls["n"] == 1:
+                return httpx.Response(503, json={"error": {"message": "down"}})
+            return httpx.Response(200, json=make_completion(content="zai ok"))
+
+        provider = self._provider(httpx.MockTransport(handler))
+        await provider.complete([{"role": "user", "content": "hi"}], reasoning_effort="high")
+        assert "reasoning_effort" not in captured[1]
+
+    async def test_fallback_preserves_tools(self) -> None:
+        captured: list[dict] = []
+        calls = {"n": 0}
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            captured.append(json.loads(request.content.decode("utf-8")))
+            calls["n"] += 1
+            if calls["n"] == 1:
+                return httpx.Response(503, json={"error": {"message": "down"}})
+            return httpx.Response(200, json=make_completion(content="zai ok"))
+
+        provider = self._provider(httpx.MockTransport(handler))
+        tools = [{"type": "function", "function": {"name": "x", "parameters": {}}}]
+        await provider.complete([{"role": "user", "content": "hi"}], tools=tools)
+        assert captured[1]["tools"] == tools
+        assert captured[1]["tool_choice"] == "auto"
+
+    async def test_invalid_fallback_model_is_reported(self) -> None:
+        def handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(503, json={"error": {"message": "down"}})
+
+        provider = self._provider(
+            httpx.MockTransport(handler), fallback_model_id="glm-9-imaginary"
+        )
+        with pytest.raises(LLMProviderError, match="fallback model is invalid"):
+            await provider.complete([{"role": "user", "content": "hi"}])
+
