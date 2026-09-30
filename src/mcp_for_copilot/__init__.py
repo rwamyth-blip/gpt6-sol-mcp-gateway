@@ -1,17 +1,17 @@
-"""gpt6-sol-mcp-gateway — an MCP gateway for GPT-6 Sol and friends.
+"""mcp-for-copilot — an MCP gateway for GPT-6 Sol and friends.
 
 Two ways to use this package:
 
 **As a library** — wire the layers yourself::
 
-    from gpt6_sol_mcp import Gateway
+    from mcp_for_copilot import Gateway
 
     gw = Gateway(api_key="sk-...", model="gpt-6-sol")
     result = await gw.chat("Explain MCP in one paragraph.")
 
 **As a server** — run the OpenAI-compatible FastAPI app::
 
-    gpt6-mcp-gateway serve --port 8000
+    mcp-for-copilot serve --port 8000
 
 Layered architecture (each layer is independently testable):
 

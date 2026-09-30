@@ -65,7 +65,7 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'release' || inputs.publish
     environment:
       name: pypi
-      url: https://pypi.org/p/gpt6-sol-mcp-gateway
+      url: https://pypi.org/p/mcp-for-copilot
     permissions:
       # Required for PyPI Trusted Publishing (OIDC). No API token is stored.
       id-token: write

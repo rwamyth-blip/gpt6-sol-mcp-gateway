@@ -16,8 +16,8 @@ import logging
 
 import pytest
 
-from gpt6_sol_mcp.config import Settings
-from gpt6_sol_mcp.mcp_client import (
+from mcp_for_copilot.config import Settings
+from mcp_for_copilot.mcp_client import (
     MCPClient,
     MCPClientError,
     MCPClientManager,
@@ -113,7 +113,7 @@ class TestRouting:
         manager = MCPClientManager(
             {"good": FakeMCPClient(tools=fake_tools), "broken": _BrokenClient()}
         )
-        with caplog.at_level(logging.WARNING, logger="gpt6_sol_mcp"):
+        with caplog.at_level(logging.WARNING, logger="mcp_for_copilot"):
             listed = await manager.list_all_tools()
 
         assert [t.name for t in listed["good"]] == ["read_file", "write_file"]

@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import pytest
 
-from gpt6_sol_mcp.config import Settings
+from mcp_for_copilot.config import Settings
 
 
 class TestOpenAIApiKeyFallback:

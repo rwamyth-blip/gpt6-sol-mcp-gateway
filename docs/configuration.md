@@ -105,11 +105,11 @@ empty tuple means deny everything.
 ## Inspecting the effective configuration
 
 ```bash
-gpt6-mcp-gateway status
+mcp-for-copilot status
 ```
 
 ```python
-from gpt6_sol_mcp import get_settings
+from mcp_for_copilot import get_settings
 
 print(get_settings().describe())
 ```
@@ -122,7 +122,7 @@ print(get_settings().describe())
 environment:
 
 ```python
-from gpt6_sol_mcp import get_settings, reset_settings_cache
+from mcp_for_copilot import get_settings, reset_settings_cache
 
 os.environ["LLM_MODEL_ID"] = "gpt-6-luna"
 reset_settings_cache()

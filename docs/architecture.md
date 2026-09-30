@@ -5,7 +5,7 @@
 ```mermaid
 flowchart TB
     subgraph Entry["Entry points"]
-        CLI["cli.py<br/>gpt6-mcp-gateway"]
+        CLI["cli.py<br/>mcp-for-copilot"]
         APP["gateway/app.py<br/>FastAPI"]
         SRV["gateway/server.py<br/>MCP stdio server"]
     end

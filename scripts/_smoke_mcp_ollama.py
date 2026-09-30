@@ -19,8 +19,8 @@ MCP_PY = ROOT.parents[1] / "mcp" / "ollama_mcp.py"
 
 
 async def main() -> int:
-    from gpt6_sol_mcp.config import get_settings
-    from gpt6_sol_mcp.mcp_client import MCPClient
+    from mcp_for_copilot.config import get_settings
+    from mcp_for_copilot.mcp_client import MCPClient
 
     s = get_settings()
     print("=== settings.describe() ===")

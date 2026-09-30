@@ -301,7 +301,7 @@ def _env_file_candidates() -> list[Path]:
     never ``cd``-ed), and in that case every setting silently fell back to its
     default -- including ``MCP_SERVER_URL``, which disabled tool calling with no
     error. The package root is derived from this file's location
-    (``<root>/src/gpt6_sol_mcp/config.py``), so it is correct regardless of cwd.
+    (``<root>/src/mcp_for_copilot/config.py``), so it is correct regardless of cwd.
     """
     package_root = Path(__file__).resolve().parents[2]
     candidates = [Path.cwd() / ".env", package_root / ".env"]

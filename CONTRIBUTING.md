@@ -1,4 +1,4 @@
-# Contributing to GPT-6 Sol MCP Gateway
+# Contributing to MCP for Copilot
 
 Thanks for taking the time to contribute! 🎉
 
@@ -37,8 +37,8 @@ By participating you agree to abide by our
 
 ```bash
 # 1. Fork the repo on GitHub, then clone your fork
-git clone https://github.com/<your-username>/gpt6-sol-mcp-gateway.git
-cd gpt6-sol-mcp-gateway
+git clone https://github.com/<your-username>/mcp-for-copilot.git
+cd mcp-for-copilot
 
 # 2. Create a virtual environment
 python -m venv .venv
@@ -75,7 +75,7 @@ make check
 ## Project layout
 
 ```
-src/gpt6_sol_mcp/
+src/mcp_for_copilot/
 ├── __init__.py          # public API surface
 ├── config.py            # env-driven Settings
 ├── logging_utils.py     # secret redaction + logging helpers
@@ -84,7 +84,7 @@ src/gpt6_sol_mcp/
 ├── tool_router.py       # allowlist + argument validation
 ├── approval.py          # human-in-the-loop approval layer
 ├── orchestrator.py      # the model → tool → model loop
-├── cli.py               # gpt6-mcp-gateway entry point
+├── cli.py               # mcp-for-copilot entry point
 └── gateway/
     ├── facade.py        # Gateway — owns the whole stack
     ├── app.py           # FastAPI OpenAI-compatible app
@@ -199,5 +199,5 @@ Trusted Publishing — no API token is stored in the repo.
 
 ## Questions?
 
-Open a [discussion](https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/discussions)
+Open a [discussion](https://github.com/rwamyth-blip/mcp-for-copilot/discussions)
 or an issue. We are happy to help.

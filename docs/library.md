@@ -4,7 +4,7 @@ The library surface is the `Gateway` facade plus the lower-level building blocks
 the top-level package.
 
 ```python
-from gpt6_sol_mcp import Gateway, LLMMCPOrchestrator, ToolRouter, ApprovalLayer
+from mcp_for_copilot import Gateway, LLMMCPOrchestrator, ToolRouter, ApprovalLayer
 ```
 
 ## The `Gateway` facade
@@ -14,7 +14,7 @@ orchestrator. Use it as an async context manager so the MCP connection is closed
 
 ```python
 import asyncio
-from gpt6_sol_mcp import Gateway
+from mcp_for_copilot import Gateway
 
 async def main() -> None:
     async with Gateway(connect_mcp=False) as gateway:
@@ -73,7 +73,7 @@ the model may execute. The plan is reset at the start of every `chat()` call, so
 inherits another's plan.
 
 ```python
-from gpt6_sol_mcp import Gateway, get_settings
+from mcp_for_copilot import Gateway, get_settings
 
 settings = get_settings().model_copy(update={"mcp_plan_mode": True})
 async with Gateway(settings=settings) as gateway:
@@ -102,7 +102,7 @@ print(result.plan_progress)  # {'pending': 2, 'in_progress': 1, 'done': 3, 'bloc
 An approver is any callable that takes an `ApprovalRequest` and returns an `ApprovalDecision`.
 
 ```python
-from gpt6_sol_mcp import ApprovalDecision, ApprovalRequest
+from mcp_for_copilot import ApprovalDecision, ApprovalRequest
 
 def my_approver(request: ApprovalRequest) -> ApprovalDecision:
     print(f"Tool: {request.tool}")
@@ -123,7 +123,7 @@ Three factories ship with the package:
 | `static_approver(allow=(...), deny=(...))` | Keyword-only allow/deny lists by tool name. |
 
 ```python
-from gpt6_sol_mcp import static_approver
+from mcp_for_copilot import static_approver
 
 approver = static_approver(allow=("read_file",), deny=("write_file",))
 ```
@@ -137,7 +137,7 @@ approver = static_approver(allow=("read_file",), deny=("write_file",))
 `ToolRouter` is usable on its own if you want to reuse the safety logic elsewhere.
 
 ```python
-from gpt6_sol_mcp import ToolRouter, is_risky_tool
+from mcp_for_copilot import ToolRouter, is_risky_tool
 
 print(is_risky_tool("delete_file"))   # True
 print(is_risky_tool("read_file"))     # False
@@ -153,7 +153,7 @@ defaults". This distinction matters when you want a locked-down deployment.
 ## Using the orchestrator directly
 
 ```python
-from gpt6_sol_mcp import LLMMCPOrchestrator, LLMProvider, MCPClient
+from mcp_for_copilot import LLMMCPOrchestrator, LLMProvider, MCPClient
 
 provider = LLMProvider()
 client = MCPClient(url="python -m my_mcp_server", transport="stdio")
@@ -166,7 +166,7 @@ print(result.content, result.error)
 ## Model resolution
 
 ```python
-from gpt6_sol_mcp import resolve_model_id, aliases_for, KNOWN_MODELS
+from mcp_for_copilot import resolve_model_id, aliases_for, KNOWN_MODELS
 
 print(resolve_model_id("sol"))        # gpt-6-sol
 print(resolve_model_id("gpt6"))       # gpt-6-sol

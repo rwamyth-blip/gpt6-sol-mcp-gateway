@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# GPT-6 Sol MCP Gateway — local stack
+# MCP for Copilot — local stack
 #
 #   docker compose up gateway   # FastAPI gateway on :8000
 #   docker compose up mcp       # stdio MCP server (for an MCP client to attach)
@@ -13,8 +13,8 @@ services:
     build:
       context: .
       target: runtime
-    image: gpt6-sol-mcp-gateway:local
-    container_name: gpt6-gateway
+    image: mcp-for-copilot:local
+    container_name: mcp-for-copilot-gateway
     command: ["serve", "--host", "0.0.0.0", "--port", "8000"]
     env_file:
       - path: .env
@@ -43,14 +43,14 @@ services:
       retries: 3
     restart: unless-stopped
     networks:
-      - gpt6
+      - mcp-for-copilot
 
   mcp:
     build:
       context: .
       target: runtime
-    image: gpt6-sol-mcp-gateway:local
-    container_name: gpt6-mcp
+    image: mcp-for-copilot:local
+    container_name: mcp-for-copilot-mcp
     # The stdio server reads JSON-RPC on stdin. `sleep infinity` keeps the
     # container alive so an MCP client can `docker exec` into it; for a real
     # deployment, attach your MCP client directly to the stdio process.
@@ -68,15 +68,15 @@ services:
         - CMD
         - python
         - -c
-        - "import gpt6_sol_mcp, sys; sys.exit(0 if gpt6_sol_mcp.__version__ else 1)"
+        - "import mcp_for_copilot, sys; sys.exit(0 if mcp_for_copilot.__version__ else 1)"
       interval: 30s
       timeout: 5s
       start_period: 10s
       retries: 3
     restart: unless-stopped
     networks:
-      - gpt6
+      - mcp-for-copilot
 
 networks:
-  gpt6:
+  mcp-for-copilot:
     driver: bridge

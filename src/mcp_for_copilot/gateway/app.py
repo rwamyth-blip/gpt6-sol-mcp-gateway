@@ -110,7 +110,7 @@ def create_app(
             await app.state.gateway.stop()
 
     app = FastAPI(
-        title="GPT-6 Sol MCP Gateway",
+        title="MCP for Copilot",
         version="0.1.0",
         description=(
             "OpenAI-compatible gateway that gives GPT-6 Sol tool access "
@@ -172,7 +172,7 @@ def create_app(
 
     @app.get("/health")
     async def health() -> dict[str, Any]:
-        return {"status": "ok", "service": "gpt6-sol-mcp-gateway"}
+        return {"status": "ok", "service": "mcp-for-copilot"}
 
     @router.get("/models")
     async def list_models(

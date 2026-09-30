@@ -6,7 +6,7 @@ another agent) can use GPT6-SOL as a tool.
 ## Start it
 
 ```bash
-gpt6-mcp-gateway mcp
+mcp-for-copilot mcp
 ```
 
 This speaks MCP over **stdio**. The process reads JSON-RPC from stdin and writes to stdout, so it must
@@ -55,7 +55,7 @@ success rate, token usage, and estimated cost from the local model catalog.
     {
       "mcpServers": {
         "gpt6-sol": {
-          "command": "gpt6-mcp-gateway",
+          "command": "mcp-for-copilot",
           "args": ["mcp"],
           "env": {"OPENAI_API_KEY": "sk-..."}
         }
@@ -72,7 +72,7 @@ success rate, token usage, and estimated cost from the local model catalog.
       "servers": {
         "gpt6-sol": {
           "type": "stdio",
-          "command": "gpt6-mcp-gateway",
+          "command": "mcp-for-copilot",
           "args": ["mcp"],
           "env": {"OPENAI_API_KEY": "sk-..."}
         }
@@ -88,7 +88,7 @@ success rate, token usage, and estimated cost from the local model catalog.
     {
       "mcpServers": {
         "gpt6-sol": {
-          "command": "gpt6-mcp-gateway",
+          "command": "mcp-for-copilot",
           "args": ["mcp"],
           "env": {"OPENAI_API_KEY": "sk-..."}
         }
@@ -100,7 +100,7 @@ success rate, token usage, and estimated cost from the local model catalog.
 
 ```python
 import asyncio
-from gpt6_sol_mcp.gateway.server import build_server
+from mcp_for_copilot.gateway.server import build_server
 
 server = build_server()
 asyncio.run(server.run_stdio_async())

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import pytest
 
-from gpt6_sol_mcp.cli import _build_parser
+from mcp_for_copilot.cli import _build_parser
 
 
 class TestParser:

@@ -15,19 +15,19 @@ This page takes you from zero to a working GPT6-SOL tool-calling request in abou
 === "Library only"
 
     ```bash
-    pip install gpt6-sol-mcp-gateway
+    pip install mcp-for-copilot
     ```
 
 === "With the HTTP server"
 
     ```bash
-    pip install "gpt6-sol-mcp-gateway[server]"
+    pip install "mcp-for-copilot[server]"
     ```
 
 === "Everything"
 
     ```bash
-    pip install "gpt6-sol-mcp-gateway[all]"
+    pip install "mcp-for-copilot[all]"
     ```
 
 ## 3. Configure
@@ -53,7 +53,7 @@ See [Configuration](configuration.md) for the full list.
 
 ```python
 import asyncio
-from gpt6_sol_mcp import Gateway
+from mcp_for_copilot import Gateway
 
 async def main() -> None:
     async with Gateway(connect_mcp=False) as gateway:
@@ -66,7 +66,7 @@ asyncio.run(main())
 ### As a server
 
 ```bash
-gpt6-mcp-gateway serve --host 0.0.0.0 --port 8080
+mcp-for-copilot serve --host 0.0.0.0 --port 8080
 ```
 
 ```bash
@@ -84,7 +84,7 @@ Point the gateway at any MCP server. The command below assumes a stdio server th
 
 ```python
 import asyncio
-from gpt6_sol_mcp import Gateway, allow_all_approver
+from mcp_for_copilot import Gateway, allow_all_approver
 
 async def main() -> None:
     async with Gateway(approver=allow_all_approver()) as gateway:
@@ -103,7 +103,7 @@ The MCP endpoint and allowlist come from `MCP_SERVER_URL`, `MCP_TRANSPORT`, and 
 ## 6. Verify your setup
 
 ```bash
-gpt6-mcp-gateway status
+mcp-for-copilot status
 ```
 
 ```json

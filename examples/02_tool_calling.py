@@ -14,16 +14,16 @@ import asyncio
 import os
 import sys
 
-from gpt6_sol_mcp import Gateway, allow_all_approver
+from mcp_for_copilot import Gateway, allow_all_approver
 
 
 async def main() -> int:
     # Point the gateway at its own MCP server, spawned over stdio.
     os.environ["MCP_TRANSPORT"] = "stdio"
-    os.environ["MCP_SERVER_URL"] = f'"{sys.executable}" -m gpt6_sol_mcp.gateway.server'
+    os.environ["MCP_SERVER_URL"] = f'"{sys.executable}" -m mcp_for_copilot.gateway.server'
     os.environ["MCP_ALLOWED_TOOLS"] = "gpt6_models,gpt6_status,gpt6_tools"
 
-    from gpt6_sol_mcp import reset_settings_cache
+    from mcp_for_copilot import reset_settings_cache
 
     reset_settings_cache()
 

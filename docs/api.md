@@ -4,52 +4,52 @@ Generated from docstrings with [mkdocstrings](https://mkdocstrings.github.io/).
 
 ## Top-level package
 
-::: gpt6_sol_mcp
+::: mcp_for_copilot
 
 ## Configuration
 
-::: gpt6_sol_mcp.config
+::: mcp_for_copilot.config
 
 ## Provider
 
-::: gpt6_sol_mcp.provider
+::: mcp_for_copilot.provider
 
 ## MCP client
 
-::: gpt6_sol_mcp.mcp_client
+::: mcp_for_copilot.mcp_client
 
 ## Tool router
 
-::: gpt6_sol_mcp.tool_router
+::: mcp_for_copilot.tool_router
 
 ## Approval
 
-::: gpt6_sol_mcp.approval
+::: mcp_for_copilot.approval
 
 ## Orchestrator
 
-::: gpt6_sol_mcp.orchestrator
+::: mcp_for_copilot.orchestrator
 
 ## Gateway facade
 
-::: gpt6_sol_mcp.gateway.facade
+::: mcp_for_copilot.gateway.facade
 
 ## HTTP application
 
-::: gpt6_sol_mcp.gateway.app
+::: mcp_for_copilot.gateway.app
 
 ## Debug marathon
 
-::: gpt6_sol_mcp.debug_marathon
+::: mcp_for_copilot.debug_marathon
 
 ## MCP server
 
-::: gpt6_sol_mcp.gateway.server
+::: mcp_for_copilot.gateway.server
 
 ## Logging utilities
 
-::: gpt6_sol_mcp.logging_utils
+::: mcp_for_copilot.logging_utils
 
 ## CLI
 
-::: gpt6_sol_mcp.cli
+::: mcp_for_copilot.cli

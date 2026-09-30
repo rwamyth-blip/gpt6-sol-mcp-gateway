@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from gpt6_sol_mcp.mcp_client import MCPTool
-from gpt6_sol_mcp.tool_router import (
+from mcp_for_copilot.mcp_client import MCPTool
+from mcp_for_copilot.tool_router import (
     DEFAULT_ALLOWED_TOOLS,
     ToolRouter,
     is_risky_tool,
@@ -180,7 +180,7 @@ class TestToolRouter:
         assert [t.name for t in router.available()] == ["read_file"]
 
     def test_register_rejects_nameless_tool(self) -> None:
-        from gpt6_sol_mcp.tool_router import ToolRouterError
+        from mcp_for_copilot.tool_router import ToolRouterError
 
         with pytest.raises(ToolRouterError):
             ToolRouter().register(MCPTool(name=""))

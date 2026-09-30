@@ -96,5 +96,5 @@ stdio to prove the transport works.
 
 ### How do I add a new model?
 
-Add an entry to `KNOWN_MODELS` in `src/gpt6_sol_mcp/provider.py`, plus any aliases in `MODEL_ALIASES`.
+Add an entry to `KNOWN_MODELS` in `src/mcp_for_copilot/provider.py`, plus any aliases in `MODEL_ALIASES`.
 Add a test in `tests/unit/test_provider.py`.

@@ -1,5 +1,5 @@
 # ---------------------------------------------------------------------------
-# GPT-6 Sol MCP Gateway — developer tasks
+# MCP for Copilot — developer tasks
 # ---------------------------------------------------------------------------
 .DEFAULT_GOAL := help
 .PHONY: help install install-dev lint format typecheck test test-unit test-integration test-e2e \
@@ -7,7 +7,7 @@
         pre-commit release-dry
 
 PYTHON ?= python
-PACKAGE := gpt6_sol_mcp
+PACKAGE := mcp_for_copilot
 SRC := src/$(PACKAGE)
 TESTS := tests
 
@@ -77,7 +77,7 @@ docs-serve: ## Serve the docs locally with live reload
 
 # -- docker -----------------------------------------------------------------
 docker-build: ## Build the Docker image
-	docker build -t gpt6-sol-mcp-gateway:local .
+	docker build -t mcp-for-copilot:local .
 
 docker-up: ## Start the local stack
 	docker compose up -d

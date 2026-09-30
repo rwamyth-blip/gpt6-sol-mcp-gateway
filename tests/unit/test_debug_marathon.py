@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from gpt6_sol_mcp.debug_marathon import DebugMarathon, _estimate_cost_usd, prioritize_tasks
-from gpt6_sol_mcp.provider import ProviderResponse
+from mcp_for_copilot.debug_marathon import DebugMarathon, _estimate_cost_usd, prioritize_tasks
+from mcp_for_copilot.provider import ProviderResponse
 
 
 def _task(title: str, priority: int, difficulty: int, complexity: int) -> dict:

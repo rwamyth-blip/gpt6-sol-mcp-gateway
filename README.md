@@ -1,22 +1,22 @@
 <div align="center">
 
-# 🛰️ GPT-6 Sol MCP Gateway
+# 🛰️ MCP for Copilot
 
-**Give GPT-6 Sol hands.**
+**Give Copilot hands.**
 
 A production-ready [Model Context Protocol](https://modelcontextprotocol.io) gateway.
 Use it as a **Python library** or deploy it as an **OpenAI-compatible FastAPI service**.
 
-[![CI](https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/actions/workflows/ci.yml/badge.svg)](https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/actions/workflows/ci.yml)
-[![CodeQL](https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/actions/workflows/codeql.yml/badge.svg)](https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/actions/workflows/codeql.yml)
-[![PyPI](https://img.shields.io/pypi/v/gpt6-sol-mcp-gateway.svg)](https://pypi.org/project/gpt6-sol-mcp-gateway/)
-[![Python](https://img.shields.io/pypi/pyversions/gpt6-sol-mcp-gateway.svg)](https://pypi.org/project/gpt6-sol-mcp-gateway/)
+[![CI](https://github.com/rwamyth-blip/mcp-for-copilot/actions/workflows/ci.yml/badge.svg)](https://github.com/rwamyth-blip/mcp-for-copilot/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/rwamyth-blip/mcp-for-copilot/actions/workflows/codeql.yml/badge.svg)](https://github.com/rwamyth-blip/mcp-for-copilot/actions/workflows/codeql.yml)
+[![PyPI](https://img.shields.io/pypi/v/mcp-for-copilot.svg)](https://pypi.org/project/mcp-for-copilot/)
+[![Python](https://img.shields.io/pypi/pyversions/mcp-for-copilot.svg)](https://pypi.org/project/mcp-for-copilot/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen.svg)](#-testing)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![Docker](https://img.shields.io/badge/docker-ghcr.io-blue.svg)](https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/pkgs/container/gpt6-sol-mcp-gateway)
+[![Docker](https://img.shields.io/badge/docker-ghcr.io-blue.svg)](https://github.com/rwamyth-blip/mcp-for-copilot/pkgs/container/mcp-for-copilot)
 
-[Quick Start](#-quick-start) · [Installation](#-installation) · [Examples](#-usage-examples) · [Architecture](#️-architecture) · [Docs](https://rwamyth-blip.github.io/gpt6-sol-mcp-gateway/) · [Contributing](#-contributing)
+[Quick Start](#-quick-start) · [Installation](#-installation) · [Examples](#-usage-examples) · [Architecture](#️-architecture) · [Docs](https://rwamyth-blip.github.io/mcp-for-copilot/) · [Contributing](#-contributing)
 
 </div>
 
@@ -24,8 +24,8 @@ Use it as a **Python library** or deploy it as an **OpenAI-compatible FastAPI se
 
 ## 🎯 What is this?
 
-GPT-6 Sol is a strong reasoning model, but on its own it cannot read your files,
-query your database, or run your tools. **GPT-6 Sol MCP Gateway** connects it to
+Copilot is a strong reasoning assistant, but on its own it cannot read your files,
+query your database, or run your tools. **MCP for Copilot** connects it to
 any [MCP server](https://modelcontextprotocol.io) and puts three safety gates in
 front of every tool call: an **allowlist**, an **approval layer**, and
 **argument validation**.
@@ -63,12 +63,12 @@ server can be its tool provider.
 ### Option A — Use as a library
 
 ```bash
-pip install "gpt6-sol-mcp-gateway[library]"
+pip install "mcp-for-copilot[library]"
 ```
 
 ```python
 import asyncio
-from gpt6_sol_mcp import Gateway
+from mcp_for_copilot import Gateway
 
 async def main():
     async with Gateway() as gateway:
@@ -84,9 +84,9 @@ asyncio.run(main())
 ### Option B — Deploy as a server
 
 ```bash
-pip install "gpt6-sol-mcp-gateway[server]"
+pip install "mcp-for-copilot[server]"
 export LLM_API_KEY=sk-...
-gpt6-mcp-gateway serve
+mcp-for-copilot serve
 ```
 
 ```bash
@@ -105,13 +105,13 @@ That is the whole setup. Any OpenAI SDK client works against it unchanged.
 
 ```bash
 # Library only — talk to an MCP server from your own code
-pip install "gpt6-sol-mcp-gateway[library]"
+pip install "mcp-for-copilot[library]"
 
 # Server — FastAPI gateway + stdio MCP server
-pip install "gpt6-sol-mcp-gateway[server]"
+pip install "mcp-for-copilot[server]"
 
 # Everything
-pip install "gpt6-sol-mcp-gateway[all]"
+pip install "mcp-for-copilot[all]"
 ```
 
 ### Docker
@@ -119,14 +119,14 @@ pip install "gpt6-sol-mcp-gateway[all]"
 ```bash
 docker run --rm -p 8000:8000 \
   -e LLM_API_KEY=sk-... \
-  ghcr.io/rwamyth-blip/gpt6-sol-mcp-gateway:latest
+  ghcr.io/rwamyth-blip/mcp-for-copilot:latest
 ```
 
 ### From source
 
 ```bash
-git clone https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway.git
-cd gpt6-sol-mcp-gateway
+git clone https://github.com/rwamyth-blip/mcp-for-copilot.git
+cd mcp-for-copilot
 pip install -e ".[all,dev]"
 cp .env.example .env   # then edit .env
 ```
@@ -139,7 +139,7 @@ cp .env.example .env   # then edit .env
 
 ```python
 import asyncio
-from gpt6_sol_mcp import Gateway
+from mcp_for_copilot import Gateway
 
 async def main():
     async with Gateway() as gateway:
@@ -174,7 +174,7 @@ print(response.choices[0].message.content)
 
 ```python
 import asyncio
-from gpt6_sol_mcp import Gateway, static_approver
+from mcp_for_copilot import Gateway, static_approver
 
 async def main():
     approver = static_approver(allow=["write_file"], deny=["delete_file"])
@@ -190,9 +190,9 @@ asyncio.run(main())
 ### 4. CLI — one-shot prompt
 
 ```bash
-gpt6-mcp-gateway chat "What models do you support?" --json
-gpt6-mcp-gateway models
-gpt6-mcp-gateway status
+mcp-for-copilot chat "What models do you support?" --json
+mcp-for-copilot models
+mcp-for-copilot status
 ```
 
 ---
@@ -206,7 +206,7 @@ flowchart LR
         B["Your Python code"]
     end
 
-    subgraph Gateway["gpt6-sol-mcp-gateway"]
+    subgraph Gateway["mcp-for-copilot"]
         C["FastAPI app<br/>/v1/chat/completions"]
         D["Gateway facade"]
         E["Orchestrator<br/>model → tool → model"]
@@ -335,7 +335,7 @@ No test touches the network: `httpx` transports and the MCP client are injected.
 ## 📚 Documentation
 
 Full documentation lives at
-**[rwamyth-blip.github.io/gpt6-sol-mcp-gateway](https://rwamyth-blip.github.io/gpt6-sol-mcp-gateway/)**.
+**[rwamyth-blip.github.io/mcp-for-copilot](https://rwamyth-blip.github.io/mcp-for-copilot/)**.
 
 - [Getting started](docs/getting-started.md)
 - [Library guide](docs/guides/library.md)
@@ -351,15 +351,15 @@ Contributions are welcome. Please read [CONTRIBUTING.md](CONTRIBUTING.md) and
 [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) first.
 
 ```bash
-git clone https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway.git
-cd gpt6-sol-mcp-gateway
+git clone https://github.com/rwamyth-blip/mcp-for-copilot.git
+cd mcp-for-copilot
 pip install -e ".[all,dev]"
 pre-commit install
 make check
 ```
 
 Good first issues are labelled
-[`good first issue`](https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/labels/good%20first%20issue).
+[`good first issue`](https://github.com/rwamyth-blip/mcp-for-copilot/labels/good%20first%20issue).
 
 ---
 
@@ -369,7 +369,7 @@ Please **do not** open a public issue for a vulnerability. See
 [SECURITY.md](SECURITY.md) for the private disclosure process.
 
 This package never logs a credential: every log line and error message passes
-through `gpt6_sol_mcp.logging_utils.redact()`.
+through `mcp_for_copilot.logging_utils.redact()`.
 
 ---
 
@@ -381,11 +381,11 @@ through `gpt6_sol_mcp.logging_utils.redact()`.
 
 ## ⭐ Star History
 
-<a href="https://star-history.com/#rwamyth-blip/gpt6-sol-mcp-gateway&Date">
+<a href="https://star-history.com/#rwamyth-blip/mcp-for-copilot&Date">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=rwamyth-blip/gpt6-sol-mcp-gateway&type=Date&theme=dark" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=rwamyth-blip/gpt6-sol-mcp-gateway&type=Date" />
-    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=rwamyth-blip/gpt6-sol-mcp-gateway&type=Date" width="600" />
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=rwamyth-blip/mcp-for-copilot&type=Date&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=rwamyth-blip/mcp-for-copilot&type=Date" />
+    <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=rwamyth-blip/mcp-for-copilot&type=Date" width="600" />
   </picture>
 </a>
 

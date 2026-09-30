@@ -5,14 +5,14 @@ The gateway ships an OpenAI-compatible HTTP API, so any OpenAI SDK client works 
 ## Start the server
 
 ```bash
-gpt6-mcp-gateway serve --host 0.0.0.0 --port 8080
+mcp-for-copilot serve --host 0.0.0.0 --port 8080
 ```
 
 Or programmatically:
 
 ```python
 import uvicorn
-from gpt6_sol_mcp.gateway.app import create_app
+from mcp_for_copilot.gateway.app import create_app
 
 app = create_app()
 uvicorn.run(app, host="0.0.0.0", port=8080)
@@ -32,7 +32,7 @@ uvicorn.run(app, host="0.0.0.0", port=8080)
 ### `GET /health`
 
 ```json
-{"status": "ok", "service": "gpt6-sol-mcp-gateway"}
+{"status": "ok", "service": "mcp-for-copilot"}
 ```
 
 ### `GET /v1/models`
@@ -143,7 +143,7 @@ upstream is not.
 ### Build
 
 ```bash
-docker build -t gpt6-sol-mcp-gateway:latest .
+docker build -t mcp-for-copilot:latest .
 ```
 
 The image is multi-stage: a builder stage compiles the wheel, and a slim runtime stage installs it as a
@@ -155,7 +155,7 @@ non-root user (uid `10001`) with a `HEALTHCHECK` against `/health`.
 docker run --rm -p 8080:8080 \
   -e LLM_API_KEY="sk-..." \
   -e LLM_MODEL_ID="gpt-6-sol" \
-  gpt6-sol-mcp-gateway:latest
+  mcp-for-copilot:latest
 ```
 
 ### Compose

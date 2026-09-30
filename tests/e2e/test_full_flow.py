@@ -17,11 +17,11 @@ import sys
 
 import pytest
 
-from gpt6_sol_mcp.approval import allow_all_approver, static_approver
-from gpt6_sol_mcp.config import Settings
-from gpt6_sol_mcp.gateway.facade import Gateway
-from gpt6_sol_mcp.mcp_client import MCPClient, MCPTool
-from gpt6_sol_mcp.provider import LLMProvider
+from mcp_for_copilot.approval import allow_all_approver, static_approver
+from mcp_for_copilot.config import Settings
+from mcp_for_copilot.gateway.facade import Gateway
+from mcp_for_copilot.mcp_client import MCPClient, MCPTool
+from mcp_for_copilot.provider import LLMProvider
 
 from ..conftest import FakeMCPClient, make_completion, make_tool_call, mock_transport
 

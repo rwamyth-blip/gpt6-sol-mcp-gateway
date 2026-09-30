@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import asyncio
 
-from gpt6_sol_mcp.debug_marathon import (
+from mcp_for_copilot.debug_marathon import (
     MAX_PLAN_STEPS,
     VERIFICATION_MARKER,
     DebugMarathon,
@@ -22,7 +22,7 @@ from gpt6_sol_mcp.debug_marathon import (
     _strip_markers,
     _task_verification,
 )
-from gpt6_sol_mcp.provider import ProviderResponse
+from mcp_for_copilot.provider import ProviderResponse
 
 
 def _task(title: str, priority: int = 3, difficulty: int = 3, complexity: int = 3) -> dict:

@@ -7,7 +7,7 @@ from typing import ClassVar
 import httpx
 import pytest
 
-from gpt6_sol_mcp.provider import (
+from mcp_for_copilot.provider import (
     KNOWN_MODELS,
     MODEL_ALIASES,
     LLMProvider,
@@ -49,11 +49,11 @@ class TestResolveModelId:
             resolve_model_id("gpt-9-imaginary")
 
     def test_empty_id_raises(self, monkeypatch: pytest.MonkeyPatch) -> None:
-        from gpt6_sol_mcp.config import Settings, reset_settings_cache
+        from mcp_for_copilot.config import Settings, reset_settings_cache
 
         reset_settings_cache()
         monkeypatch.setattr(
-            "gpt6_sol_mcp.provider.get_settings",
+            "mcp_for_copilot.provider.get_settings",
             lambda: Settings(llm_model_id=""),
         )
         with pytest.raises(LLMProviderError, match="No model configured"):

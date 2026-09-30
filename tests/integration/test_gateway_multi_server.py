@@ -18,10 +18,10 @@ from typing import Any
 
 import pytest
 
-from gpt6_sol_mcp.config import Settings
-from gpt6_sol_mcp.gateway.facade import Gateway
-from gpt6_sol_mcp.mcp_client import MCPClientError, MCPClientManager, MCPTool
-from gpt6_sol_mcp.provider import LLMProvider
+from mcp_for_copilot.config import Settings
+from mcp_for_copilot.gateway.facade import Gateway
+from mcp_for_copilot.mcp_client import MCPClientError, MCPClientManager, MCPTool
+from mcp_for_copilot.provider import LLMProvider
 
 from ..conftest import FakeMCPClient, make_completion, mock_transport
 
@@ -109,7 +109,7 @@ class TestManagerSelection:
     ) -> None:
         gateway = _gateway(_settings(mcp_server_url="python -m legacy"))
         fake = FakeMCPClient()
-        monkeypatch.setattr("gpt6_sol_mcp.gateway.facade.MCPClient", lambda **kwargs: fake)
+        monkeypatch.setattr("mcp_for_copilot.gateway.facade.MCPClient", lambda **kwargs: fake)
 
         await _connect(gateway)
 

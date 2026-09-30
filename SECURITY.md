@@ -11,7 +11,7 @@
 **Please do not report security vulnerabilities through public GitHub issues.**
 
 Report privately using GitHub's
-[private vulnerability reporting](https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/security/advisories/new),
+[private vulnerability reporting](https://github.com/rwamyth-blip/mcp-for-copilot/security/advisories/new),
 or email **dev@vihokai.com**.
 
 Please include:

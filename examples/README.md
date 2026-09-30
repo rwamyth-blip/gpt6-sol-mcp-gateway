@@ -11,7 +11,7 @@ Three runnable examples, in increasing order of complexity. Each one needs only 
 ## Setup
 
 ```bash
-pip install "gpt6-sol-mcp-gateway[all]"
+pip install "mcp-for-copilot[all]"
 export LLM_API_KEY="sk-..."
 ```
 
@@ -25,7 +25,7 @@ python examples/03_custom_approval.py
 
 Examples 2 and 3 spawn the gateway's own bundled MCP server as a subprocess, so they need no external
 MCP server. They set `MCP_SERVER_URL` to the current interpreter plus
-`-m gpt6_sol_mcp.gateway.server`, which is the same command the CLI uses for `gpt6-mcp-gateway mcp`.
+`-m mcp_for_copilot.gateway.server`, which is the same command the CLI uses for `mcp-for-copilot mcp`.
 
 ## Notes
 

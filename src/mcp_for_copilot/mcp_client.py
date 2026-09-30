@@ -4,7 +4,7 @@ Supports three transports:
 
 ``stdio``
     Spawns a subprocess and speaks newline-delimited JSON-RPC over its
-    stdin/stdout. This is the transport used by ``gpt6-mcp-gateway mcp``.
+    stdin/stdout. This is the transport used by ``mcp-for-copilot mcp``.
 ``http``
     Streamable HTTP: one POST per JSON-RPC message.
 ``sse``
@@ -221,7 +221,7 @@ class MCPClient:
                 {
                     "protocolVersion": _MCP_PROTOCOL_VERSION,
                     "capabilities": {},
-                    "clientInfo": {"name": "gpt6-sol-mcp-gateway", "version": "0.1.0"},
+                    "clientInfo": {"name": "mcp-for-copilot", "version": "0.1.0"},
                 },
             )
             self._server_info = result or {}
@@ -487,7 +487,7 @@ class MCPClient:
 
 def default_stdio_command() -> str:
     """Command used when ``MCP_SERVER_URL`` is unset for the stdio transport."""
-    return f"{shlex.quote(sys.executable)} -m gpt6_sol_mcp.gateway.server"
+    return f"{shlex.quote(sys.executable)} -m mcp_for_copilot.gateway.server"
 
 
 class MCPClientManager:

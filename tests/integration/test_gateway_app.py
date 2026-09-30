@@ -6,10 +6,10 @@ import json
 
 from fastapi.testclient import TestClient
 
-from gpt6_sol_mcp.config import Settings
-from gpt6_sol_mcp.gateway.app import create_app
-from gpt6_sol_mcp.gateway.facade import Gateway
-from gpt6_sol_mcp.provider import LLMProvider
+from mcp_for_copilot.config import Settings
+from mcp_for_copilot.gateway.app import create_app
+from mcp_for_copilot.gateway.facade import Gateway
+from mcp_for_copilot.provider import LLMProvider
 
 from ..conftest import FakeMCPClient, make_completion, make_tool_call, mock_transport
 
@@ -314,7 +314,7 @@ class TestStreaming:
 
 class TestTokenEstimation:
     def test_thai_text_uses_a_denser_ratio(self) -> None:
-        from gpt6_sol_mcp.gateway.app import _estimate_tokens
+        from mcp_for_copilot.gateway.app import _estimate_tokens
 
         thai = _estimate_tokens("สวัสดีครับ")
         latin = _estimate_tokens("hello there")
@@ -322,12 +322,12 @@ class TestTokenEstimation:
         assert latin > 0
 
     def test_empty_text_is_zero(self) -> None:
-        from gpt6_sol_mcp.gateway.app import _estimate_tokens
+        from mcp_for_copilot.gateway.app import _estimate_tokens
 
         assert _estimate_tokens("") == 0
 
     def test_usage_prefers_provider_values(self) -> None:
-        from gpt6_sol_mcp.gateway.app import _usage
+        from mcp_for_copilot.gateway.app import _usage
 
         raw = {"prompt_tokens": 1, "completion_tokens": 2, "total_tokens": 3}
         assert _usage("a", "b", raw) == raw

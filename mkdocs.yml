@@ -1,8 +1,8 @@
-site_name: GPT6-SOL MCP Gateway
-site_description: Production-ready MCP gateway for GPT6-SOL. Use as a library or deploy as a FastAPI service.
-site_url: https://rwamyth-blip.github.io/gpt6-sol-mcp-gateway/
-repo_url: https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway
-repo_name: rwamyth-blip/gpt6-sol-mcp-gateway
+site_name: MCP for Copilot
+site_description: Production-ready MCP gateway for Copilot. Use as a library or deploy as a FastAPI service.
+site_url: https://rwamyth-blip.github.io/mcp-for-copilot/
+repo_url: https://github.com/rwamyth-blip/mcp-for-copilot
+repo_name: rwamyth-blip/mcp-for-copilot
 edit_uri: edit/main/docs/
 
 theme:
@@ -88,8 +88,8 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway
+      link: https://github.com/rwamyth-blip/mcp-for-copilot
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/gpt6-sol-mcp-gateway/
+      link: https://pypi.org/project/mcp-for-copilot/
 
-copyright: Copyright &copy; 2025 GPT6-SOL MCP Gateway contributors — MIT License
+copyright: Copyright &copy; 2025 MCP for Copilot contributors — MIT License

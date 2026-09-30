@@ -1,1 +1,1 @@
-"""Test package for gpt6-sol-mcp-gateway."""
+"""Test package for mcp-for-copilot."""

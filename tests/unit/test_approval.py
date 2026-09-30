@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from gpt6_sol_mcp.approval import (
+from mcp_for_copilot.approval import (
     ApprovalDecision,
     ApprovalLayer,
     ApprovalRequest,

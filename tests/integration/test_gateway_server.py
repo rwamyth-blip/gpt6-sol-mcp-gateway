@@ -4,15 +4,15 @@ from __future__ import annotations
 
 import json
 
-from gpt6_sol_mcp.gateway.facade import Gateway
-from gpt6_sol_mcp.gateway.server import SERVER_NAME, build_server
-from gpt6_sol_mcp.provider import LLMProvider
+from mcp_for_copilot.gateway.facade import Gateway
+from mcp_for_copilot.gateway.server import SERVER_NAME, build_server
+from mcp_for_copilot.provider import LLMProvider
 
 from ..conftest import FakeMCPClient, make_completion, mock_transport
 
 
 def _gateway(fake_client: FakeMCPClient | None = None) -> Gateway:
-    from gpt6_sol_mcp.config import Settings
+    from mcp_for_copilot.config import Settings
 
     settings = Settings(
         llm_api_key="sk-test",
@@ -51,7 +51,7 @@ async def _list_tools(server) -> list:
 
 class TestServerMetadata:
     def test_server_name(self) -> None:
-        assert SERVER_NAME == "gpt6-sol-mcp-gateway"
+        assert SERVER_NAME == "mcp-for-copilot"
 
     async def test_lists_all_tools(self) -> None:
         server = build_server(_gateway())

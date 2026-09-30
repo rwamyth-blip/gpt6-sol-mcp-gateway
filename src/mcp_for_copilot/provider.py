@@ -11,7 +11,7 @@ Design rules
   default is never a literal inside this module.
 * **No hardcoded credential.** The key comes from ``settings.llm_api_key``.
 * **No secret in an error.** Every raised message is passed through
-  :func:`gpt6_sol_mcp.logging_utils.redact`.
+  :func:`mcp_for_copilot.logging_utils.redact`.
 * **Tools are passed through, never invented.** The adapter forwards the tool
   list it is given; it does not add tools of its own.
 """
@@ -768,7 +768,7 @@ class LLMProvider:
         """Convert MCP tool descriptors into OpenAI function-calling schemas.
 
         Accepts objects exposing ``name`` / ``description`` / ``input_schema``
-        (i.e. :class:`gpt6_sol_mcp.mcp_client.MCPTool`).
+        (i.e. :class:`mcp_for_copilot.mcp_client.MCPTool`).
         """
         converted: list[dict[str, Any]] = []
         for tool in tools:

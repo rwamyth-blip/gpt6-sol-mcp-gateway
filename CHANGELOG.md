@@ -59,7 +59,7 @@ First public release.
 - **Model catalog** — GPT-6 Astra/Sol/Luna and GPT-5.6 Sol/Luna with context
   windows, output caps, reasoning-effort support, and pricing metadata.
 - **Model aliases** — `gpt-6`, `gpt6`, `sol`, `luna`, `astra`, `gpt-5.6`.
-- **CLI** — `gpt6-mcp-gateway` with `serve`, `mcp`, `chat`, `models`, and
+- **CLI** — `mcp-for-copilot` with `serve`, `mcp`, `chat`, `models`, and
   `status` subcommands.
 - **Docker** — multi-stage image, non-root user, healthcheck, and a
   `docker-compose.yml` with `gateway` and `mcp` services.
@@ -74,5 +74,5 @@ First public release.
   `/v1/chat/completions`, and the field must be present — omitting it is also
   rejected.
 
-[Unreleased]: https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/releases/tag/v0.1.0
+[Unreleased]: https://github.com/rwamyth-blip/mcp-for-copilot/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/rwamyth-blip/mcp-for-copilot/releases/tag/v0.1.0

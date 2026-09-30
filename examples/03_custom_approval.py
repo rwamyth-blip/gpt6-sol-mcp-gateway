@@ -14,7 +14,7 @@ import asyncio
 import os
 import sys
 
-from gpt6_sol_mcp import ApprovalDecision, ApprovalRequest, Gateway, reset_settings_cache
+from mcp_for_copilot import ApprovalDecision, ApprovalRequest, Gateway, reset_settings_cache
 
 
 def audit_approver(request: ApprovalRequest) -> ApprovalDecision:
@@ -28,7 +28,7 @@ def audit_approver(request: ApprovalRequest) -> ApprovalDecision:
 
 async def main() -> int:
     os.environ["MCP_TRANSPORT"] = "stdio"
-    os.environ["MCP_SERVER_URL"] = f'"{sys.executable}" -m gpt6_sol_mcp.gateway.server'
+    os.environ["MCP_SERVER_URL"] = f'"{sys.executable}" -m mcp_for_copilot.gateway.server'
     os.environ["MCP_ALLOWED_TOOLS"] = "gpt6_models,gpt6_status"
     reset_settings_cache()
 

@@ -1,4 +1,4 @@
-# Starts the GPT-6 Sol MCP gateway as a hidden background process.
+# Starts the MCP for Copilot gateway as a hidden background process.
 #
 # Used by the Startup-folder shortcut so the gateway survives logoff/reboot.
 # Safe to run repeatedly: an existing listener on the port is left alone.
@@ -35,7 +35,7 @@ $existing = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction Sil
 if ($existing) {
     $ownerPid = $existing[0].OwningProcess
     $cmd = (Get-CimInstance Win32_Process -Filter "ProcessId=$ownerPid" -ErrorAction SilentlyContinue).CommandLine
-    if ($cmd -and $cmd -like "*gpt6_sol_mcp*") {
+    if ($cmd -and $cmd -like "*mcp_for_copilot*") {
         Write-Output "Gateway already listening on port $port (PID $ownerPid)."
         exit 0
     }
@@ -61,7 +61,7 @@ $env:PYTHONPATH = Join-Path $gwDir "src"
 
 $proc = Start-Process -FilePath $python `
     -ArgumentList @(
-        "-m", "uvicorn", "gpt6_sol_mcp.gateway.app:app",
+        "-m", "uvicorn", "mcp_for_copilot.gateway.app:app",
         "--host", "127.0.0.1", "--port", "$port"
     ) `
     -WorkingDirectory $gwDir `

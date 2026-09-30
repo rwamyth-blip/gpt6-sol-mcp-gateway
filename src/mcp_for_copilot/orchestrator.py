@@ -6,9 +6,9 @@ round:
 1. Ask the model, passing the tool schemas it is allowed to use.
 2. If the model returns no tool calls, the turn is finished.
 3. For each requested tool call, run the **three gates**:
-   a. **Allowlist** — :class:`~gpt6_sol_mcp.tool_router.ToolRouter`
-   b. **Approval** — :class:`~gpt6_sol_mcp.approval.ApprovalLayer`
-   c. **Dispatch** — :class:`~gpt6_sol_mcp.mcp_client.MCPClient`
+   a. **Allowlist** — :class:`~mcp_for_copilot.tool_router.ToolRouter`
+   b. **Approval** — :class:`~mcp_for_copilot.approval.ApprovalLayer`
+   c. **Dispatch** — :class:`~mcp_for_copilot.mcp_client.MCPClient`
 4. Feed the tool results back to the model and repeat.
 
 A denied or failed tool is reported back to the model as an error result

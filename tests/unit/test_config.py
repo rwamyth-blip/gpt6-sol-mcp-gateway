@@ -7,8 +7,8 @@ import logging
 import pytest
 from pydantic import ValidationError
 
-from gpt6_sol_mcp.config import Settings
-from gpt6_sol_mcp.logging_utils import (
+from mcp_for_copilot.config import Settings
+from mcp_for_copilot.logging_utils import (
     contains_secret,
     redact,
     redact_mapping,
@@ -97,14 +97,14 @@ class TestSettings:
         # Regression: this warning path used log_warning without importing it,
         # so a typo in MCP_SERVERS raised NameError instead of being skipped.
         settings = Settings(mcp_servers="[not json")
-        with caplog.at_level(logging.WARNING, logger="gpt6_sol_mcp"):
+        with caplog.at_level(logging.WARNING, logger="mcp_for_copilot"):
             parsed = settings.mcp_servers_parsed
         assert parsed == []
         assert "Failed to parse MCP_SERVERS" in caplog.text
 
     def test_mcp_servers_non_array_is_tolerated(self, caplog: pytest.LogCaptureFixture) -> None:
         settings = Settings(mcp_servers='{"name":"ollama"}')
-        with caplog.at_level(logging.WARNING, logger="gpt6_sol_mcp"):
+        with caplog.at_level(logging.WARNING, logger="mcp_for_copilot"):
             parsed = settings.mcp_servers_parsed
         assert parsed == []
         assert "not a JSON array" in caplog.text
@@ -187,12 +187,12 @@ class TestRedact:
 
     def test_safe_log_redacts(self, caplog: pytest.LogCaptureFixture) -> None:
         secret = "sk-abcdefghijklmnopqrstuvwxyz012345"
-        with caplog.at_level(logging.WARNING, logger="gpt6_sol_mcp"):
+        with caplog.at_level(logging.WARNING, logger="mcp_for_copilot"):
             safe_log(logging.WARNING, "key=%s", secret)
         assert secret not in caplog.text
         assert "REDACTED" in caplog.text
 
     def test_safe_log_keeps_scalar_types(self, caplog: pytest.LogCaptureFixture) -> None:
-        with caplog.at_level(logging.INFO, logger="gpt6_sol_mcp"):
+        with caplog.at_level(logging.INFO, logger="mcp_for_copilot"):
             safe_log(logging.INFO, "rounds=%d ratio=%.2f", 3, 0.5)
         assert "rounds=3 ratio=0.50" in caplog.text

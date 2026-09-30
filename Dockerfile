@@ -60,5 +60,5 @@ port=os.environ.get('GATEWAY_PORT','8000'); \
 sys.exit(0 if urllib.request.urlopen(f'http://127.0.0.1:{port}/health', timeout=4).status==200 else 1)"
 
 # Default: the FastAPI gateway. Override with `mcp` for the stdio server.
-ENTRYPOINT ["gpt6-mcp-gateway"]
+ENTRYPOINT ["mcp-for-copilot"]
 CMD ["serve"]

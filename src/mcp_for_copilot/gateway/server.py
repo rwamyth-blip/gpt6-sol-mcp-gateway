@@ -2,11 +2,11 @@
 
 Run it directly::
 
-    python -m gpt6_sol_mcp.gateway.server
+    python -m mcp_for_copilot.gateway.server
 
 or let a client spawn it::
 
-    gpt6-mcp-gateway mcp
+    mcp-for-copilot mcp
 
 Tools
 -----
@@ -49,7 +49,7 @@ from ..logging_utils import log_error, log_info, redact
 from ..provider import KNOWN_MODELS, MODEL_ALIASES
 from .facade import Gateway
 
-SERVER_NAME = "gpt6-sol-mcp-gateway"
+SERVER_NAME = "mcp-for-copilot"
 
 _CHAT_SCHEMA: dict[str, Any] = {
     "type": "object",
@@ -232,7 +232,7 @@ async def _copilot_install(args: dict[str, Any]) -> dict[str, Any]:
     steps: list[str] = []
 
     if do_install:
-        rc, out, err = await _run_cmd("npm", "install", "-g", COPILOT_PACKAGE, timeout=300)
+        rc, _out, _err = await _run_cmd("npm", "install", "-g", COPILOT_PACKAGE, timeout=300)
         steps.append(f"npm install -g {COPILOT_PACKAGE} -> rc={rc}")
 
     version, how = await _copilot_version()
@@ -579,7 +579,7 @@ async def _run() -> None:
 
 
 def main() -> None:
-    """Console entry point for ``python -m gpt6_sol_mcp.gateway.server``."""
+    """Console entry point for ``python -m mcp_for_copilot.gateway.server``."""
     with contextlib.suppress(KeyboardInterrupt):
         asyncio.run(_run())
 

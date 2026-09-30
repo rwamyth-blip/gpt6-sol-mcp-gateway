@@ -10,7 +10,7 @@ from __future__ import annotations
 import asyncio
 import sys
 
-from gpt6_sol_mcp import Gateway
+from mcp_for_copilot import Gateway
 
 
 async def main() -> int:

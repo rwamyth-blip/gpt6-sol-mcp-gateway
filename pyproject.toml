@@ -3,9 +3,9 @@ requires = ["hatchling>=1.24"]
 build-backend = "hatchling.build"
 
 [project]
-name = "gpt6-sol-mcp-gateway"
+name = "mcp-for-copilot"
 version = "0.1.0"
-description = "Production-ready MCP gateway for GPT-6 Sol. Use as a library or deploy as a FastAPI service."
+description = "Production-ready MCP gateway for Copilot. Use as a library or deploy as a FastAPI service."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
@@ -59,17 +59,17 @@ dev = [
 ]
 
 [project.scripts]
-gpt6-mcp-gateway = "gpt6_sol_mcp.cli:main"
+mcp-for-copilot = "mcp_for_copilot.cli:main"
 
 [project.urls]
-Homepage = "https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway"
-Documentation = "https://rwamyth-blip.github.io/gpt6-sol-mcp-gateway/"
-Repository = "https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway"
-Issues = "https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/issues"
-Changelog = "https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/blob/main/CHANGELOG.md"
+Homepage = "https://github.com/rwamyth-blip/mcp-for-copilot"
+Documentation = "https://rwamyth-blip.github.io/mcp-for-copilot/"
+Repository = "https://github.com/rwamyth-blip/mcp-for-copilot"
+Issues = "https://github.com/rwamyth-blip/mcp-for-copilot/issues"
+Changelog = "https://github.com/rwamyth-blip/mcp-for-copilot/blob/main/CHANGELOG.md"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/gpt6_sol_mcp"]
+packages = ["src/mcp_for_copilot"]
 
 [tool.hatch.build.targets.sdist]
 include = ["src", "tests", "examples", "docs", "README.md", "LICENSE", "CHANGELOG.md"]
@@ -111,10 +111,10 @@ asyncio_mode = "auto"
 # it a developer's exported credential reaches the suite and is printed by a
 # failing assertion.
 addopts = "-ra --strict-markers --strict-config -p tests.scrub_credentials_plugin"
-filterwarnings = ["error::DeprecationWarning:gpt6_sol_mcp.*"]
+filterwarnings = ["error::DeprecationWarning:mcp_for_copilot.*"]
 
 [tool.coverage.run]
-source = ["src/gpt6_sol_mcp"]
+source = ["src/mcp_for_copilot"]
 branch = true
 
 [tool.coverage.report]

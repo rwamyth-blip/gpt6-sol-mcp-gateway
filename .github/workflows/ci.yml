@@ -77,7 +77,7 @@ jobs:
         run: pip install -e ".[all,dev]"
 
       - name: Run tests with coverage
-        run: pytest --cov=gpt6_sol_mcp --cov-report=term-missing --cov-report=xml
+        run: pytest --cov=mcp_for_copilot --cov-report=term-missing --cov-report=xml
 
       - name: Upload coverage to Codecov
         if: matrix.python-version == '3.12'
@@ -120,8 +120,8 @@ jobs:
         run: |
           python -m venv /tmp/verify
           /tmp/verify/bin/pip install dist/*.whl
-          /tmp/verify/bin/python -c "import gpt6_sol_mcp; print('version', gpt6_sol_mcp.__version__)"
-          /tmp/verify/bin/gpt6-mcp-gateway models
+          /tmp/verify/bin/python -c "import mcp_for_copilot; print('version', mcp_for_copilot.__version__)"
+          /tmp/verify/bin/mcp-for-copilot models
 
       - name: Upload distribution
         uses: actions/upload-artifact@v4
@@ -146,11 +146,11 @@ jobs:
           target: runtime
           push: false
           load: true
-          tags: gpt6-sol-mcp-gateway:ci
+          tags: mcp-for-copilot:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
       - name: Smoke test the image
         run: |
-          docker run --rm gpt6-sol-mcp-gateway:ci models
-          docker run --rm gpt6-sol-mcp-gateway:ci status
+          docker run --rm mcp-for-copilot:ci models
+          docker run --rm mcp-for-copilot:ci status

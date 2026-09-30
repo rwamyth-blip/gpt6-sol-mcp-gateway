@@ -15,8 +15,8 @@ from typing import Any
 import httpx
 import pytest
 
-from gpt6_sol_mcp.config import Settings, reset_settings_cache
-from gpt6_sol_mcp.mcp_client import MCPCallResult, MCPTool
+from mcp_for_copilot.config import Settings, reset_settings_cache
+from mcp_for_copilot.mcp_client import MCPCallResult, MCPTool
 
 
 @pytest.fixture(autouse=True)
@@ -121,7 +121,7 @@ def mock_transport(
 
 
 class FakeMCPClient:
-    """In-memory stand-in for :class:`gpt6_sol_mcp.mcp_client.MCPClient`."""
+    """In-memory stand-in for :class:`mcp_for_copilot.mcp_client.MCPClient`."""
 
     def __init__(
         self,

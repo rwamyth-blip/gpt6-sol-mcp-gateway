@@ -11,15 +11,15 @@ properties that matter:
 
 from __future__ import annotations
 
-from gpt6_sol_mcp.approval import ApprovalLayer, deny_all_approver
-from gpt6_sol_mcp.config import Settings
-from gpt6_sol_mcp.orchestrator import (
+from mcp_for_copilot.approval import ApprovalLayer, deny_all_approver
+from mcp_for_copilot.config import Settings
+from mcp_for_copilot.orchestrator import (
     PLAN_TOOL_NAME,
     LLMMCPOrchestrator,
     _parse_plan,
 )
-from gpt6_sol_mcp.provider import LLMProvider
-from gpt6_sol_mcp.tool_router import ToolRouter
+from mcp_for_copilot.provider import LLMProvider
+from mcp_for_copilot.tool_router import ToolRouter
 
 from ..conftest import make_completion, make_tool_call, mock_transport
 

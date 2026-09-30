@@ -19,7 +19,7 @@ import logging
 import re
 from typing import Any
 
-logger = logging.getLogger("gpt6_sol_mcp")
+logger = logging.getLogger("mcp_for_copilot")
 
 # ---------------------------------------------------------------------------
 # Redaction rules

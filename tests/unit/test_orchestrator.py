@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from gpt6_sol_mcp.approval import ApprovalLayer, allow_all_approver, deny_all_approver
-from gpt6_sol_mcp.orchestrator import LLMMCPOrchestrator
-from gpt6_sol_mcp.provider import LLMProvider
-from gpt6_sol_mcp.tool_router import ToolRouter
+from mcp_for_copilot.approval import ApprovalLayer, allow_all_approver, deny_all_approver
+from mcp_for_copilot.orchestrator import LLMMCPOrchestrator
+from mcp_for_copilot.provider import LLMProvider
+from mcp_for_copilot.tool_router import ToolRouter
 
 from ..conftest import FakeMCPClient, make_completion, make_tool_call, mock_transport
 
@@ -226,7 +226,7 @@ class TestGateTwoApproval:
 
 class TestGateThreeDispatch:
     async def test_tool_error_is_reported_not_raised(self, fake_client) -> None:
-        from gpt6_sol_mcp.mcp_client import MCPCallResult
+        from mcp_for_copilot.mcp_client import MCPCallResult
 
         fake_client._results["read_file"] = MCPCallResult(
             tool="read_file", content="permission denied", is_error=True
@@ -248,7 +248,7 @@ class TestGateThreeDispatch:
         assert result.invocations[0].is_error is True
 
     async def test_client_exception_is_captured(self, fake_client) -> None:
-        from gpt6_sol_mcp.mcp_client import MCPClientError
+        from mcp_for_copilot.mcp_client import MCPClientError
 
         async def boom(name, arguments=None):
             raise MCPClientError("transport died")
@@ -281,7 +281,7 @@ class TestGateThreeDispatch:
             ]
         )
         router = ToolRouter(allowed_tools=["read_file"], require_approval=True)
-        from gpt6_sol_mcp.mcp_client import MCPTool
+        from mcp_for_copilot.mcp_client import MCPTool
 
         router.register(MCPTool(name="read_file", input_schema={}))
         orchestrator = LLMMCPOrchestrator(
@@ -343,7 +343,7 @@ class TestToolSchemas:
         assert "tools" not in captured[0]
 
     async def test_list_tools_failure_is_tolerated(self) -> None:
-        from gpt6_sol_mcp.mcp_client import MCPClientError
+        from mcp_for_copilot.mcp_client import MCPClientError
 
         class BrokenClient(FakeMCPClient):
             async def list_tools(self):

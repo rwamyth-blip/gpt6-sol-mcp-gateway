@@ -80,7 +80,7 @@ Every log helper (`log_info`, `log_warning`, `log_error`, `log_debug`, `safe_log
 ## Reporting a vulnerability
 
 Please **do not** open a public issue for security problems. See
-[SECURITY.md](https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/blob/main/SECURITY.md) for the
+[SECURITY.md](https://github.com/rwamyth-blip/mcp-for-copilot/blob/main/SECURITY.md) for the
 private reporting process.
 
 ## Supported versions

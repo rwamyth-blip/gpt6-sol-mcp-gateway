@@ -31,10 +31,10 @@ from .provider import KNOWN_MODELS, MODEL_ALIASES
 
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="gpt6-mcp-gateway",
-        description="GPT-6 Sol MCP Gateway — OpenAI-compatible gateway with MCP tools.",
+        prog="mcp-for-copilot",
+        description="MCP for Copilot — OpenAI-compatible gateway with MCP tools.",
     )
-    parser.add_argument("--version", action="version", version="gpt6-sol-mcp-gateway 0.1.0")
+    parser.add_argument("--version", action="version", version="mcp-for-copilot 0.1.0")
     sub = parser.add_subparsers(dest="command", required=True)
 
     serve = sub.add_parser("serve", help="Run the FastAPI gateway (uvicorn).")
@@ -89,7 +89,7 @@ def _cmd_serve(args: argparse.Namespace) -> int:
     except ImportError:
         print(
             "uvicorn is not installed. Install the server extras:\n"
-            "  pip install 'gpt6-sol-mcp-gateway[server]'",
+            "  pip install 'mcp-for-copilot[server]'",
             file=sys.stderr,
         )
         return 1
@@ -99,7 +99,7 @@ def _cmd_serve(args: argparse.Namespace) -> int:
     port = args.port or settings.gateway_port
     print(f"Starting gateway on http://{host}:{port}")
     uvicorn.run(
-        "gpt6_sol_mcp.gateway.app:app",
+        "mcp_for_copilot.gateway.app:app",
         host=host,
         port=port,
         reload=bool(args.reload),
@@ -226,7 +226,7 @@ def _cmd_status(_args: argparse.Namespace) -> int:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Entry point for the ``gpt6-mcp-gateway`` console script."""
+    """Entry point for the ``mcp-for-copilot`` console script."""
     args = _build_parser().parse_args(argv)
     handlers = {
         "serve": _cmd_serve,

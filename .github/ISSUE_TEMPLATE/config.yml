@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/security/advisories/new
+    url: https://github.com/rwamyth-blip/mcp-for-copilot/security/advisories/new
     about: Please report security issues privately, not as a public issue.
   - name: Question or discussion
-    url: https://github.com/rwamyth-blip/gpt6-sol-mcp-gateway/discussions
+    url: https://github.com/rwamyth-blip/mcp-for-copilot/discussions
     about: Ask usage questions and share ideas here.
   - name: Documentation
-    url: https://rwamyth-blip.github.io/gpt6-sol-mcp-gateway/
+    url: https://rwamyth-blip.github.io/mcp-for-copilot/
     about: Read the full documentation.

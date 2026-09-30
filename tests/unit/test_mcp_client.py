@@ -7,7 +7,7 @@ import json
 import httpx
 import pytest
 
-from gpt6_sol_mcp.mcp_client import (
+from mcp_for_copilot.mcp_client import (
     MCPClient,
     MCPClientError,
     MCPTool,
@@ -72,7 +72,7 @@ class TestMCPClientInit:
         assert MCPClient(url="x", transport="STDIO").transport == "stdio"
 
     def test_default_stdio_command_mentions_the_module(self) -> None:
-        assert "gpt6_sol_mcp.gateway.server" in default_stdio_command()
+        assert "mcp_for_copilot.gateway.server" in default_stdio_command()
 
 
 def _sse_body(payload: dict) -> str:
