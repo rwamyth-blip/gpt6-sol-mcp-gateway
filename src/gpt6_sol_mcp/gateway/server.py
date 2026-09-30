@@ -25,6 +25,12 @@ Tools
     Queue prioritized debug tasks through GPT-6 Luna, Sol, and Astra.
 ``gpt6_debug_marathon_status``
     Get a queued debug marathon's progress and results.
+``copilot_install``
+    Verify (and optionally install) the GitHub Copilot CLI.
+``hubspot_track``
+    Record a lead through VihokAI's own HubSpot route.
+``vihokai_deploy``
+    Report on, and optionally push, the VihokAI repository.
 """
 
 from __future__ import annotations
@@ -103,6 +109,265 @@ _DEBUG_MARATHON_STATUS_SCHEMA: dict[str, Any] = {
     "additionalProperties": False,
 }
 
+_COPILOT_INSTALL_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "install": {
+            "type": "boolean",
+            "description": "Run `npm install -g @github/copilot`. Default false (verify only).",
+        },
+    },
+    "additionalProperties": False,
+}
+
+_HUBSPOT_TRACK_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "message": {"type": "string", "description": "What the lead asked for."},
+        "intent": {
+            "type": "string",
+            "enum": ["pitch", "invest", "api", "support"],
+            "description": "pitch / invest / api / support.",
+        },
+        "email": {"type": "string", "description": "Optional lead email."},
+        "site": {"type": "string", "description": "Base URL. Default https://www.vihokai.com"},
+    },
+    "required": ["message", "intent"],
+    "additionalProperties": False,
+}
+
+_VIHOKAI_DEPLOY_SCHEMA: dict[str, Any] = {
+    "type": "object",
+    "properties": {
+        "push": {
+            "type": "boolean",
+            "description": "Actually push. Default false — report status only.",
+        },
+        "allow_main": {
+            "type": "boolean",
+            "description": "Permit acting on main. Default false.",
+        },
+    },
+    "additionalProperties": False,
+}
+
+# Repo root for the VihokAI checkout. Kept as a constant so it is one edit, not
+# a search-and-replace across the file.
+REPO_ROOT = r"D:\PYWWW\vihokai_com_complete\ai_super_platform"
+COPILOT_PACKAGE = "@github/copilot"
+COPILOT_JS_ENTRY = REPO_ROOT + r"\github-copilot-1.0.89-win32-x64\package\app.js"
+
+
+async def _run_cmd(*argv: str, timeout: float = 60.0) -> tuple[int, str, str]:
+    """Run a command with no shell and a hard timeout.
+
+    An argument tuple means a message can never be re-parsed as shell syntax.
+    Returns ``(returncode, stdout, stderr)``; never raises.
+    """
+    try:
+        proc = await asyncio.create_subprocess_exec(
+            *argv,
+            # stdin MUST be DEVNULL. Without it the child inherits this server's
+            # own stdin pipe, so a CLI that reads stdin swallows the remaining
+            # JSON-RPC frames and the MCP session dies with "Connection closed".
+            stdin=asyncio.subprocess.DEVNULL,
+            stdout=asyncio.subprocess.PIPE,
+            stderr=asyncio.subprocess.PIPE,
+            cwd=REPO_ROOT,
+            # No console window on Windows; the client has no interactive UI
+            # to attach to anyway.
+            creationflags=getattr(__import__("subprocess"), "CREATE_NO_WINDOW", 0),
+        )
+    except OSError as exc:
+        return -1, "", str(exc)
+    try:
+        out, err = await asyncio.wait_for(proc.communicate(), timeout)
+    except asyncio.TimeoutError:
+        with contextlib.suppress(ProcessLookupError):
+            proc.kill()
+        return -1, "", "timed out"
+    return proc.returncode or 0, out.decode("utf-8", "replace"), err.decode("utf-8", "replace")
+
+
+def _env_present(name: str) -> str:
+    """Report whether an env var is set — never its value."""
+    import os
+
+    return f"{name}: set" if os.environ.get(name) else f"{name}: not set"
+
+
+async def _copilot_version() -> tuple[str | None, str]:
+    """Return ``(version, how)`` for the Copilot CLI, or ``(None, why)``.
+
+    Prefers the extracted package's JS entry over the PATH ``copilot``: on this
+    machine the PATH shim is the VS Code bootstrapper, which prints an
+    "Install? (y/N)" prompt and blocks a non-interactive caller forever.
+    """
+    import os
+
+    if os.path.isfile(COPILOT_JS_ENTRY):
+        # node, not sys.executable: the entry point is JavaScript.
+        rc, out, err = await _run_cmd("node", COPILOT_JS_ENTRY, "--version", timeout=30)
+        if rc == 0:
+            first = next((ln.strip() for ln in (out or err).splitlines() if ln.strip()), "")
+            return (first or None), f"node {COPILOT_JS_ENTRY}"
+
+    rc, out, err = await _run_cmd("copilot", "--version", timeout=30)
+    if rc == 0:
+        first = next((ln.strip() for ln in (out or err).splitlines() if ln.strip()), "")
+        return (first or None), "copilot (PATH)"
+
+    blob = f"{out}\n{err}"
+    if "Install?" in blob or "Cannot find GitHub Copilot CLI" in blob:
+        return None, (
+            "`copilot` on PATH is the VS Code bootstrapper shim and blocks on an "
+            f"interactive prompt. Run `npm install -g {COPILOT_PACKAGE}`, or make "
+            f"{COPILOT_JS_ENTRY} exist."
+        )
+    return None, f"copilot not runnable: {(out or err).strip()[:200]}"
+
+
+async def _copilot_install(args: dict[str, Any]) -> dict[str, Any]:
+    do_install = bool(args.get("install"))
+    steps: list[str] = []
+
+    if do_install:
+        rc, out, err = await _run_cmd("npm", "install", "-g", COPILOT_PACKAGE, timeout=300)
+        steps.append(f"npm install -g {COPILOT_PACKAGE} -> rc={rc}")
+
+    version, how = await _copilot_version()
+    return {
+        "ok": version is not None,
+        "action": "install" if do_install else "verify",
+        "version": version,
+        "via": how,
+        "githubToken": _env_present("GITHUB_TOKEN"),
+        "steps": steps,
+    }
+
+
+async def _hubspot_track(args: dict[str, Any]) -> dict[str, Any]:
+    """Post a lead to VihokAI's own route, which holds the HubSpot token.
+
+    The token is never read or sent here: the app's route handler owns it, so
+    this is as safe to call as an ordinary fetch from the site.
+    """
+    import base64
+
+    message = str(args.get("message") or "").strip()
+    if not message:
+        return {"ok": False, "error": "'message' is required"}
+    intent = str(args.get("intent") or "support")
+    if intent not in ("pitch", "invest", "api", "support"):
+        return {"ok": False, "error": f"unknown intent {intent!r}"}
+
+    site = str(args.get("site") or "https://www.vihokai.com").rstrip("/")
+    target = f"{site}/api/hubspot/conversation"
+
+    body = json.dumps(
+        {
+            "message": message,
+            "intent": intent,
+            "email": args.get("email"),
+            "page": "/copilot/hubspot-chat-widget",
+            "locale": "th",
+        },
+        ensure_ascii=False,
+    ).encode("utf-8")
+    body_b64 = base64.b64encode(body).decode("ascii")
+
+    # base64, not a PowerShell here-string: a here-string needs a literal
+    # newline after @' and a Thai message does not fit that shape.
+    script = (
+        "$ProgressPreference='SilentlyContinue';"
+        f"$b=[System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String('{body_b64}'));"
+        f"try {{ $r=Invoke-WebRequest -Uri '{target}' -Method POST -ContentType 'application/json' "
+        "-Body $b -UseBasicParsing -TimeoutSec 20;"
+        'Write-Output ("STATUS:" + $r.StatusCode); Write-Output $r.Content } '
+        "catch { $c=$_.Exception.Response; if($c){ Write-Output ('STATUS:' + [int]$c.StatusCode); "
+        "$s=New-Object System.IO.StreamReader($c.GetResponseStream()); Write-Output $s.ReadToEnd() } "
+        "else { Write-Output 'STATUS:000' } }"
+    )
+
+    rc, out, err = await _run_cmd(
+        "powershell.exe", "-NoProfile", "-NonInteractive", "-Command", script, timeout=60
+    )
+    text = f"{out}\n{err}"
+    status: int | None = None
+    for line in text.splitlines():
+        if line.startswith("STATUS:"):
+            with contextlib.suppress(ValueError):
+                status = int(line.split(":", 1)[1])
+            break
+    payload = text.replace(f"STATUS:{status}", "", 1).strip() if status is not None else text.strip()
+
+    configured = False
+    mode: str | None = None
+    with contextlib.suppress(json.JSONDecodeError, AttributeError):
+        parsed = json.loads(payload)
+        configured = bool(parsed.get("configured"))
+        mode = parsed.get("mode")
+
+    return {
+        "ok": status == 200 and '"ok":false' not in payload.replace(" ", ""),
+        "target": target,
+        "httpStatus": status,
+        "routeConfigured": configured,
+        "mode": mode,
+        "response": payload[:1000],
+        "apiKey": _env_present("HUBSPOT_API_KEY"),
+        "rc": rc,
+    }
+
+
+async def _vihokai_deploy(args: dict[str, Any]) -> dict[str, Any]:
+    """Report repo state, and push only when explicitly asked and allowed."""
+    rc, out, _err = await _run_cmd("git", "rev-parse", "--abbrev-ref", "HEAD", timeout=30)
+    branch = out.strip() if rc == 0 else None
+    if not branch:
+        return {"ok": False, "action": "none", "error": "not a git repository"}
+
+    rc, sha, _ = await _run_cmd("git", "rev-parse", "--short", "HEAD", timeout=30)
+    head = sha.strip() if rc == 0 else None
+
+    rc, dirty_out, _ = await _run_cmd("git", "status", "--porcelain", "--untracked-files=no", timeout=30)
+    dirty = bool(dirty_out.strip()) if rc == 0 else None
+
+    rc, ahead_out, _ = await _run_cmd(
+        "git", "rev-list", "--count", f"origin/{branch}..HEAD", timeout=30
+    )
+    ahead = int(ahead_out.strip()) if rc == 0 and ahead_out.strip().isdigit() else None
+
+    base = {
+        "branch": branch,
+        "head": head,
+        "ahead": ahead,
+        "dirty": dirty,
+    }
+
+    steps: list[str] = []
+    if not args.get("push"):
+        return {**base, "ok": True, "action": "status-only",
+                "steps": ["skipped push (push not requested)"]}
+
+    if branch == "main" and not args.get("allow_main"):
+        return {**base, "ok": False, "action": "refused", "steps": [],
+                "error": "on main — retry with allow_main=true to deploy from main"}
+
+    if dirty and not args.get("allow_main"):
+        return {**base, "ok": False, "action": "refused", "steps": [],
+                "error": "tracked files have uncommitted changes — commit them first"}
+
+    rc, push_out, push_err = await _run_cmd("git", "push", "origin", branch, timeout=180)
+    steps.append(f"git push origin {branch} -> rc={rc}")
+    return {
+        **base,
+        "ok": rc == 0,
+        "action": "push",
+        "steps": steps,
+        "error": None if rc == 0 else (push_out + push_err).strip()[:500],
+    }
+
 
 def build_server(gateway: Gateway | None = None) -> Server:
     """Create the MCP server. *gateway* is injectable for tests."""
@@ -166,6 +431,32 @@ def build_server(gateway: Gateway | None = None) -> Server:
                     name="gpt6_debug_marathon_status",
                     description="Get progress and results for a debug marathon job_id.",
                     input_schema=_DEBUG_MARATHON_STATUS_SCHEMA,
+                ),
+                Tool(
+                    name="copilot_install",
+                    description=(
+                        "Verify the GitHub Copilot CLI, and optionally install it with "
+                        "`npm install -g @github/copilot`. Verifies only unless install=true."
+                    ),
+                    input_schema=_COPILOT_INSTALL_SCHEMA,
+                ),
+                Tool(
+                    name="hubspot_track",
+                    description=(
+                        "Record a lead through VihokAI's /api/hubspot/conversation route, "
+                        "which holds the HubSpot credential server-side. Reports whether the "
+                        "app has HubSpot configured."
+                    ),
+                    input_schema=_HUBSPOT_TRACK_SCHEMA,
+                ),
+                Tool(
+                    name="vihokai_deploy",
+                    description=(
+                        "Report the VihokAI repo branch, HEAD, commits ahead of origin, and "
+                        "dirty state. Pushes only when push=true; refuses on main without "
+                        "allow_main=true."
+                    ),
+                    input_schema=_VIHOKAI_DEPLOY_SCHEMA,
                 ),
             ]
         )
@@ -258,6 +549,15 @@ def build_server(gateway: Gateway | None = None) -> Server:
                 return [
                     TextContent(type="text", text=json.dumps(status_payload, ensure_ascii=False))
                 ]
+
+            if name == "copilot_install":
+                return [TextContent(type="text", text=json.dumps(await _copilot_install(args), ensure_ascii=False))]
+
+            if name == "hubspot_track":
+                return [TextContent(type="text", text=json.dumps(await _hubspot_track(args), ensure_ascii=False))]
+
+            if name == "vihokai_deploy":
+                return [TextContent(type="text", text=json.dumps(await _vihokai_deploy(args), ensure_ascii=False))]
 
             return [TextContent(type="text", text=f"Error: unknown tool {name!r}")]
         except Exception as exc:

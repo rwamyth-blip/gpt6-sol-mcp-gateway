@@ -53,7 +53,7 @@ class TestServerMetadata:
     def test_server_name(self) -> None:
         assert SERVER_NAME == "gpt6-sol-mcp-gateway"
 
-    async def test_lists_seven_tools(self) -> None:
+    async def test_lists_all_tools(self) -> None:
         server = build_server(_gateway())
         names = [t.name for t in await _list_tools(server)]
         assert names == [
@@ -64,6 +64,9 @@ class TestServerMetadata:
             "gpt6_plan",
             "gpt6_debug_marathon",
             "gpt6_debug_marathon_status",
+            "copilot_install",
+            "hubspot_track",
+            "vihokai_deploy",
         ]
 
     async def test_chat_tool_schema_requires_prompt(self) -> None:
