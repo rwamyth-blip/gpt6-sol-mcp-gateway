@@ -421,7 +421,7 @@ class TestZaiFallback:
         return LLMProvider(**defaults)
 
     def test_glm_models_are_registered(self) -> None:
-        for model_id in ("glm-4.5-flash", "glm-5", "glm-5.1", "glm-5.3-flash"):
+        for model_id in ("glm-4.5-flash", "glm-4.7", "glm-5", "glm-5.1", "glm-5.3-flash"):
             assert model_id in KNOWN_MODELS
             assert KNOWN_MODELS[model_id]["reasoning_effort"] == ("none",)
 
@@ -432,6 +432,8 @@ class TestZaiFallback:
             ("glm", "glm-5"),
             ("glm-flash", "glm-4.5-flash"),
             ("zai-flash", "glm-4.5-flash"),
+            ("glm-4.7-flash", "glm-4.7"),
+            ("glm47", "glm-4.7"),
             ("glm51", "glm-5.1"),
         ],
     )

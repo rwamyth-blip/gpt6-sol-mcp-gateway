@@ -285,6 +285,15 @@ KNOWN_MODELS: dict[str, dict[str, Any]] = {
         "input_price_per_mtok": 0.075,
         "output_price_per_mtok": 0.25,
     },
+    "glm-4.7": {
+        "label": "GLM-4.7 (Z.ai)",
+        "tier": "efficient",
+        "context_window": 128_000,
+        "max_output": 32_768,
+        "reasoning_effort": ("none",),
+        "input_price_per_mtok": 0.075,
+        "output_price_per_mtok": 0.25,
+    },
     "glm-5.3-flash": {
         "label": "GLM-5.3 Flash (Z.ai)",
         "tier": "efficient",
@@ -338,6 +347,8 @@ MODEL_ALIASES: dict[str, str] = {
     # Z.ai GLM aliases (standalone Z.ai team).
     "zai-flash": "glm-4.5-flash",
     "glm-flash": "glm-4.5-flash",
+    "glm-4.7-flash": "glm-4.7",
+    "glm47": "glm-4.7",
     "glm": "glm-5",
     "zai": "glm-5",
     "glm51": "glm-5.1",
