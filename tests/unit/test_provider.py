@@ -287,7 +287,10 @@ class TestComplete:
 
     async def test_tools_effort_is_always_supported_by_the_model(self) -> None:
         # Whatever the adapter picks with tools present must be a value the
-        # model actually advertises, for every model in the catalog.
+        # model actually advertises, for every model in the catalog. GLM
+        # (Z.ai) models are the one exception: the provider strips the field
+        # entirely for them (they use their own `thinking` parameter), so the
+        # key is absent rather than set.
         for model_id, spec in KNOWN_MODELS.items():
             captured: list[dict] = []
             transport = mock_transport(make_completion(), capture=captured)
@@ -296,6 +299,15 @@ class TestComplete:
                 [{"role": "user", "content": "hi"}],
                 tools=[{"type": "function", "function": {"name": "x", "parameters": {}}}],
             )
+            if model_id.startswith("glm-") or model_id.startswith("deepseek-"):
+                # glm-*: the field is always stripped (GLM uses its own
+                # `thinking` parameter). deepseek-*: accepted with tools, but
+                # only forwarded when the caller actually asks for an effort,
+                # and this test sends none.
+                assert "reasoning_effort" not in captured[0], (
+                    f"{model_id} must not be sent reasoning_effort"
+                )
+                continue
             sent = captured[0]["reasoning_effort"]
             assert sent in spec["reasoning_effort"], (
                 f"{model_id} was sent reasoning_effort={sent!r}, "

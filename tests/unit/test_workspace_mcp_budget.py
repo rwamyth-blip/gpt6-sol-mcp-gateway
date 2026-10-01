@@ -101,6 +101,8 @@ def _tool_counts() -> dict[str, int]:
         "vihokai-mongodb": 8,  # ping, list_dbs, list_colls, stats, find, count, aggregate, indexes
         "vihokai-codex": 6,  # chat, luna, models, compare, run, status
         "gpt6-sol-mcp-Local": 4,  # mcp_bridge.py: status, models, chat, compare
+        "mcp6-deepseek": 4,  # mcp_bridge.py clone on :7427, mcp6_* names via TOOL_PREFIX
+        "mcp1-gpt6": 4,  # mcp_bridge.py clone on :7428, mcp1_* names via TOOL_PREFIX
         "gpt6-sol-gpt53-codex-mcp3": 6,  # mcp3 clone, mcp3_* names
         "vihokai-mongodb-clone": 8,  # mcp2 clone, mcp2_mongo_* names
         "vihokai-codex-clone": 8,  # mcp2 clone, namespaced chat/codex/debug tools
@@ -148,6 +150,18 @@ def _tool_names() -> dict[str, list[str]]:
             "gateway_models",
             "gateway_chat",
             "gateway_compare",
+        ],
+        "mcp6-deepseek": [
+            "mcp6_gateway_status",
+            "mcp6_gateway_models",
+            "mcp6_gateway_chat",
+            "mcp6_gateway_compare",
+        ],
+        "mcp1-gpt6": [
+            "mcp1_gateway_status",
+            "mcp1_gateway_models",
+            "mcp1_gateway_chat",
+            "mcp1_gateway_compare",
         ],
         "gpt6-sol-gpt53-codex-mcp3": [
             "mcp3_vihokai_chat",

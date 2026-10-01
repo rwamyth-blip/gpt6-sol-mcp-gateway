@@ -722,7 +722,9 @@ class LLMProvider:
 
         # GLM (Z.ai) does not implement OpenAI's reasoning_effort field; a
         # strict upstream may 400 on unknown params, so never send it there.
-        if model.startswith("glm-") or "z.ai" in self.base_url:
+        # NOTE: this is a @staticmethod, so it cannot inspect self.base_url --
+        # the model id is the only signal available here.
+        if model.startswith("glm-"):
             body.pop("reasoning_effort", None)
 
         return body
