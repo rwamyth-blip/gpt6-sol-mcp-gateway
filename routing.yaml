@@ -1,0 +1,67 @@
+# GPT-6 Balanced routing - three real OpenAI models, split by workload share.
+#
+# Unlike the DeepSeek routing (mcp6-deepseek/routing.yaml), these are three
+# DISTINCT model ids, not one model with three reasoning_effort levels. The
+# gateway forwards the id verbatim to https://api.openai.com/v1, so the tier
+# table in provider.py must NOT rewrite them (see _uses_deepseek()).
+#
+# -- Design ---------------------------------------------------------------
+#   luna  (70%)  gpt-6-luna   $0.10 in / $0.50 out per Mtok
+#   sol   (20%)  gpt-6-sol    $2.00 in / $10.00 out per Mtok
+#   astra (10%)  gpt-6-astra  $10.00 in / $50.00 out per Mtok
+#
+#   Escalation: Luna confidence < 80% -> Sol | Sol confidence < 70% -> Astra
+#   Context: 1.05M tokens on all three models.
+#
+# -- Cost model -----------------------------------------------------------
+#   Per 100 tasks, assuming 1 unit of work each:
+#     luna  70 * $0.10 = $7.00
+#     sol   20 * $2.00 = $40.00
+#     astra 10 * $10.00 = $100.00
+#     total = $147.00
+#   Astra-only baseline: 100 * $10.00 = $1000.00
+#   Saving = (1000 - 147) / 1000 = 85.3%
+#   Per-task average = $147 / 100 = $1.47 (input side; output scales the same way)
+#
+# -- Tool-calling caveat --------------------------------------------------
+#   gpt-6-astra rejects reasoning_effort='none' AND rejects any other effort
+#   while function tools are present, so it cannot run the MCP tool loop on
+#   /v1/chat/completions. The gateway drops the tools for that tier and still
+#   returns a valid answer. Use luna or sol when tool calling is required.
+
+version: 2026-09-22 GPT-6 Balanced
+
+context: 1.05M all models
+
+default_tier: luna
+
+# Escalation rule: Luna confidence < 80% -> Sol | Sol confidence < 70% -> Astra
+routing: "Luna confidence < 80% -> Sol | Sol confidence < 70% -> Astra"
+
+cost:
+  usd_per_100_tasks: 6.61
+  saving_vs_astra_only: "85.3%"
+
+team:
+  luna:
+    model: gpt-6-luna
+    percent: 70
+    price: "$0.10/$0.50"
+    role: "งานง่าย ปริมาณเยอะ 70%"
+    use_for: >-
+      Summarising, translating, chat replies, routine code. High-volume work
+      where the cheapest tier is good enough.
+  sol:
+    model: gpt-6-sol
+    percent: 20
+    price: "$2.00/$10.00"
+    role: "งานกลาง Coding 20%"
+    use_for: >-
+      Analysis, feature work, PR review. The main coding tier.
+  astra:
+    model: gpt-6-astra
+    percent: 10
+    price: "$10.00/$50.00"
+    role: "งานหิน 10%"
+    use_for: >-
+      Hardest problems, long agentic planning. No tool calling on this tier.
