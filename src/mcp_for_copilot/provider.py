@@ -642,6 +642,29 @@ class LLMProvider:
         """True when the Z.ai backup is usable (enabled + key + model)."""
         return bool(self.fallback_enabled and self.fallback_api_key and self.fallback_model_id)
 
+    @property
+    def _uses_zai(self) -> bool:
+        """True when the primary upstream already IS Z.ai (or a Z.ai host)."""
+        if self.provider == "zai":
+            return True
+        return "z.ai" in self.base_url.lower()
+
+    def _glm_route(self) -> tuple[str, str, str] | None:
+        """Return ``(base_url, api_key, timeout)`` for GLM model ids.
+
+        GLM (glm-*) models only exist on Z.ai. When the primary upstream is
+        NOT Z.ai (e.g. this deployment is OpenAI-primary), sending glm-* there
+        is a guaranteed 404 "model does not exist" -- and 4xx never triggers
+        the fallback. Instead the request is routed straight to the Z.ai
+        credentials already configured for the fallback, keeping one key per
+        upstream. Returns None when the primary already serves glm-* itself.
+        """
+        if self._uses_zai:
+            return None
+        if not (self.fallback_api_key and self.fallback_base_url):
+            return None
+        return (self.fallback_base_url, self.fallback_api_key, self.fallback_timeout)
+
     def describe(self) -> dict[str, Any]:
         """Non-secret description of the adapter, safe to return over HTTP."""
         return {
@@ -838,6 +861,24 @@ class LLMProvider:
             temperature=temperature,
             reasoning_effort=reasoning_effort,
         )
+
+        # Route glm-* to Z.ai when the primary upstream is not Z.ai -- the
+        # primary would 404 on every glm id and 4xx never hits the fallback.
+        glm_route = self._glm_route() if model.startswith("glm-") else None
+        if glm_route is not None:
+            route_url, route_key, route_timeout = glm_route
+            log_debug(
+                "llm request provider=zai-primary-override model=%s messages=%d tools=%d",
+                model,
+                len(messages),
+                len(tools or []),
+            )
+            return await self._post(
+                base_url=route_url,
+                api_key=route_key,
+                body=body,
+                timeout=route_timeout,
+            )
 
         log_debug(
             "llm request provider=%s model=%s messages=%d tools=%d",

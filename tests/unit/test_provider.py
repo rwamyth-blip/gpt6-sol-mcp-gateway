@@ -440,6 +440,40 @@ class TestZaiFallback:
     def test_glm_aliases_resolve(self, alias: str, expected: str) -> None:
         assert resolve_model_id(alias) == expected
 
+    async def test_glm_model_routes_to_zai_when_primary_is_openai(self) -> None:
+        captured: list[dict] = []
+        auth_headers: list[str] = []
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            captured.append(json.loads(request.content.decode("utf-8")))
+            auth_headers.append(request.headers["authorization"])
+            return httpx.Response(200, json=make_completion(content="from glm", model="glm-4.7"))
+
+        provider = self._provider(httpx.MockTransport(handler))
+        result = await provider.complete(
+            [{"role": "user", "content": "hi"}], model_id="glm-4.7-flash"
+        )
+        assert result.content == "from glm"
+        # Alias resolved to the canonical id and went to Z.ai with its key --
+        # not the OpenAI primary that would 404 on any glm-* id.
+        assert captured[0]["model"] == "glm-4.7"
+        assert auth_headers[0] == "Bearer zai-key"
+        assert "reasoning_effort" not in captured[0]
+
+    def test_glm_route_not_applied_when_primary_is_zai(self) -> None:
+        provider = self._provider(
+            mock_transport(make_completion()),
+            base_url="https://api.z.ai/api/paas/v4",
+        )
+        assert provider._glm_route() is None
+
+    def test_glm_route_none_without_fallback_credentials(self) -> None:
+        provider = self._provider(
+            mock_transport(make_completion()),
+            fallback_api_key="",
+        )
+        assert provider._glm_route() is None
+
     def test_fallback_configured_requires_key(self) -> None:
         assert self._provider(mock_transport(make_completion())).fallback_configured is True
         assert (
